@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  db-estoque:
+    image: postgres:15 
+    container_name: postgres_trixnet
+    restart: always
+    environment:
+      POSTGRES_USER: matheus
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: trixnet_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata:
