@@ -13,6 +13,14 @@ const Item = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
+    category:{
+        type: DataTypes.ENUM(
+            "Onu", 
+            "Escritorio", 
+            "Cabeamento", 
+            "Ferramentas"
+        )
+    },
     patrimony: {
       type: DataTypes.STRING,
       allowNull: true,
