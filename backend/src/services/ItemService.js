@@ -1,5 +1,6 @@
-const { Item } = require("../model/Item");
+const  Item  = require("../model/Item");
 const { Op } = require("sequelize");
+console.log("O Item tem o método findOne?", typeof Item.findOne);
 
 class ItemService {
   async createItem(data) {
@@ -30,8 +31,20 @@ class ItemService {
     });
   }
 
-  async deleteItem(id) {
-    return await Item.destroy({ where: { id } });
+  async deleteQuantity(id,quantity) {
+    const qty = Number(quantity)
+    const item = await Item.findByPk(id);
+    if(!item){
+      throw new Error("item não encontrado")
+    }
+     if (item.balance < qty) {
+       throw new Error("Estoque insuficiente");
+     }
+
+     item.balance -= qty
+     await item.decrement('balance',{by:qty})
+     await item.reload();
+     return item
   }
 
   async updateItem(data, id) {
