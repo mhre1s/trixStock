@@ -1,8 +1,8 @@
 import axios from 'axios'
 
 const api = axios.create({
-    baseURL: 'http://localhost:3000',
-})
+  baseURL: "https://trixstock.onrender.com",
+});
 
 export const registerUser = async(userData) =>{
     const response = await api.post('/users', userData)
