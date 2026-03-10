@@ -5,7 +5,7 @@ const cors = require("cors");
 require("./model");
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 app.use(cors())
 
@@ -19,7 +19,7 @@ async function startServer() {
     await sequelize.sync({ alter: true });
     console.log("Models sincronizados e criados");
 
-    app.listen(port, () => {
+    app.listen(port, "0.0.0.0", () => {
       console.log(`Servidor rodando na porta ${port}`);
     });
   } catch (error) {
