@@ -46,7 +46,7 @@ const OperationalScreen = () => {
   
   const selecionarSugestao = (item) => {
     setName(item.name);
-    setCategory(item.Category?.name || "");
+    setCategory(item.category_id);;
     setMeasure(item.measure);
   };
 
@@ -63,11 +63,11 @@ const OperationalScreen = () => {
     mutation.mutate({
       name,
       patrimony: patrimony.trim(),
-      category,
+      category_id: category,
       balance: patrimony ? 1 : balance,
       measure,
       description,
-   });
+    });
   };
 
   return (
@@ -84,8 +84,6 @@ const OperationalScreen = () => {
             + Novo Item / Entrada
           </button>
         </div>
-
-       
       </div>
 
       {isModalOpen && (
@@ -105,7 +103,6 @@ const OperationalScreen = () => {
               onSubmit={handleSubmit}
               className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              
               <div className="md:col-span-2 relative">
                 <label className="block text-sm font-semibold text-gray-700">
                   Nome do Item
@@ -119,7 +116,6 @@ const OperationalScreen = () => {
                   placeholder="Digite o nome do item (Ex: ONU F6600, Caneta azul...)"
                 />
 
-                
                 {sugestoes.length > 0 && !itemExistente && (
                   <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
                     {sugestoes.map((item) => (
@@ -143,7 +139,6 @@ const OperationalScreen = () => {
                 )}
               </div>
 
-              
               <div className="md:col-span-1">
                 <label className="block text-sm font-semibold text-gray-700">
                   Patrimônio / SN
@@ -157,7 +152,6 @@ const OperationalScreen = () => {
                 />
               </div>
 
-             
               <div>
                 <label className="block text-sm font-semibold text-gray-700">
                   Quantidade {patrimony ? "(Unitário)" : "(Entrada)"}
@@ -177,7 +171,6 @@ const OperationalScreen = () => {
                 )}
               </div>
 
-              
               <div
                 className={
                   itemExistente ? "opacity-50 pointer-events-none" : ""
@@ -191,10 +184,10 @@ const OperationalScreen = () => {
                   onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                 >
-                  <option value="Onu">Onu</option>
-                  <option value="Escritorio">Escritório</option>
-                  <option value="Cabeamento">Cabeamento</option>
-                  <option value="Ferramentas">Ferramentas</option>
+                  <option value={1}>Onu</option>
+                  <option value={2}>Escritório</option>
+                  <option value={3}>Cabeamento</option>
+                  <option value={4}>Ferramentas</option>
                 </select>
               </div>
 
@@ -202,9 +195,7 @@ const OperationalScreen = () => {
                 className={
                   itemExistente ? "opacity-50 pointer-events-none" : ""
                 }
-              >
-               
-              </div>
+              ></div>
 
               <div
                 className={
