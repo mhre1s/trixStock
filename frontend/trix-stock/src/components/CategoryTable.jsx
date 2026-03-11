@@ -8,10 +8,10 @@ export const getItemsByCategory = async () => {
 
 // Componente
 const CategoryTable = () => {
-  const { data, isLoading, error } = useQuery(
-    ["itemsByCategory"],
-    getItemsByCategory,
-  );
+  const { data, isLoading, error } = useQuery({
+    queryKey: ["itemsByCategory"],
+    queryFn: getItemsByCategory,
+  });
 
   if (isLoading) return <p>Carregando...</p>;
   if (error) return <p>Erro ao carregar dados</p>;
