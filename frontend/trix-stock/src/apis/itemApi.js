@@ -4,6 +4,9 @@ const api = axios.create({
   baseURL: "https://trixstock.onrender.com",
 });
 
+export default api;
+
+
 export const registerItem = async(itemData) =>{
     try {
         const response = await api.post('/items', itemData)

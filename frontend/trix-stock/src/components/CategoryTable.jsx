@@ -1,5 +1,5 @@
 import { useQuery } from "@tanstack/react-query";
-import { api } from "../apis/itemApi";
+import api from "../apis/itemApi";
 
 export const getItemsByCategory = async () => {
   const res = await api.get("/items/by-category");
