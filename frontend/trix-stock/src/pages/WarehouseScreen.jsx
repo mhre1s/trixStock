@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { registerItem, getItems } from "../apis/itemApi"; // Certifique-se de que getItems está exportado
+import CategoryTable from "../components/CategoryTable";
 
 const OperationalScreen = () => {
   const queryClient = useQueryClient();
@@ -85,6 +86,7 @@ const OperationalScreen = () => {
           </button>
         </div>
       </div>
+      <CategoryTable/>
 
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
@@ -181,7 +183,7 @@ const OperationalScreen = () => {
                 </label>
                 <select
                   value={category}
-                  onChange={(e) => setCategory(e.target.value)}
+                  onChange={(e) => setCategory(Number(e.target.value))}
                   className="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
                 >
                   <option value={1}>Onu</option>

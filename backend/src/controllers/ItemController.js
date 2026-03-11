@@ -30,6 +30,18 @@ class ItemController {
       return res.status(400).json({ error: error.message });
     }
   }
+
+  async listByCategory(req, res) {
+    try {
+      const items = await ItemService.getItemsGroupedByCategory();
+      return res.json(items);
+    } catch (error) {
+      console.error(error);
+      return res
+        .status(500)
+        .json({ error: "Erro ao buscar itens por categoria" });
+    }
+  }
 }
 
     module.exports = new ItemController()

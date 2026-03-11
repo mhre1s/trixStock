@@ -115,6 +115,30 @@ class ItemService {
       lowStock: total < category.minimum,
     };
   }
+  async getItemsGroupedByCategory() {
+    const categories = await Category.findAll({
+      include: {
+        model: require("../model/Item"),
+        attributes: ["id", "name", "balance", "unit_of_measure"],
+        order: [["name", "ASC"]],
+      },
+      order: [["name", "ASC"]],
+    });
+
+    return categories.map((cat) => ({
+      id: cat.id,
+      name: cat.name,
+      minimum: cat.minimum,
+      total: cat.Items.reduce((acc, i) => acc + i.balance, 0),
+      lowStock: cat.Items.reduce((acc, i) => acc + i.balance, 0) < cat.minimum,
+      items: cat.Items.map((i) => ({
+        id: i.id,
+        name: i.name,
+        balance: i.balance,
+        unit_of_measure: i.unit_of_measure,
+      })),
+    }));
+  }
 }
 
 module.exports = new ItemService();

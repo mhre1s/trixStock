@@ -8,6 +8,7 @@ const routes = new Router();
 
 routes.post("/users", UserController.addUser);
 
+routes.get("/items/by-category", ItemController.listByCategory);
 routes.post("/items", ItemController.store);
 routes.get("/items", ItemController.list);
 routes.patch("/items/:id/quantity", ItemController.deleteQty);
