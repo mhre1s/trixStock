@@ -9,7 +9,7 @@ const OperationalScreen = () => {
   // Estados do formulário
   const [name, setName] = useState("");
   const [patrimony, setPatrimony] = useState("");
-  const [category, setCategory] = useState("Onu");
+  const [category, setCategory] = useState(1);
   const [balance, setBalance] = useState(0);
   const [measure, setMeasure] = useState("Unid");
   const [description, setDescription] = useState("");
