@@ -36,7 +36,7 @@ class ItemController {
       const items = await ItemService.getItemsGroupedByCategory();
       return res.json(items);
     } catch (error) {
-      console.error(error);
+      console.error("DEBUG BACKEND:", error); 
       return res
         .status(500)
         .json({ error: "Erro ao buscar itens por categoria" });

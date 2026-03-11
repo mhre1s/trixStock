@@ -121,7 +121,8 @@ class ItemService {
         include: [
           {
             model: Item,
-            attributes: ["id", "name", "balance"], 
+            // 1. Verifique se estes nomes batem EXATAMENTE com o seu Item.js
+            attributes: ["id", "name", "balance", "description", "patrimony"],
           },
         ],
         order: [["name", "ASC"]],
@@ -129,6 +130,8 @@ class ItemService {
 
       return categories.map((cat) => {
         const itemsList = cat.Items || [];
+
+        // Calculando o total com segurança
         const totalBalance = itemsList.reduce(
           (acc, i) => acc + (Number(i.balance) || 0),
           0,
@@ -140,11 +143,18 @@ class ItemService {
           minimum: cat.minimum || 0,
           total: totalBalance,
           lowStock: totalBalance < (cat.minimum || 0),
-          items: itemsList.map((i) => ({
-            id: i.id,
-            name: i.name,
-            balance: i.balance,
-          })),
+          items: itemsList.map((i) => {
+            // 2. O PULO DO GATO: Converte o objeto complexo do Sequelize em um objeto JS puro
+            const itemPuro = i.get({ plain: true });
+
+            return {
+              id: itemPuro.id,
+              name: itemPuro.name,
+              balance: itemPuro.balance,
+              description: itemPuro.description, // Agora ele vai aparecer no JSON
+              patrimony: itemPuro.patrimony, // Agora ele vai aparecer no JSON
+            };
+          }),
         };
       });
     } catch (error) {
