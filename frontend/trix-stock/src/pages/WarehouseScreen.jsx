@@ -11,7 +11,6 @@ const OperationalScreen = () => {
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState("Onu");
   const [balance, setBalance] = useState(0);
-  const [minimum, setMinimum] = useState(5);
   const [measure, setMeasure] = useState("Unid");
   const [description, setDescription] = useState("");
 
@@ -47,10 +46,8 @@ const OperationalScreen = () => {
   
   const selecionarSugestao = (item) => {
     setName(item.name);
-    setCategory(item.category);
-    setMinimum(item.minimum);
+    setCategory(item.Category?.name || "");
     setMeasure(item.measure);
-    
   };
 
   const closeModal = () => {
@@ -58,7 +55,6 @@ const OperationalScreen = () => {
     setName("");
     setPatrimony("");
     setBalance(0);
-    setMinimum(5);
     setDescription("");
   };
 
@@ -69,10 +65,9 @@ const OperationalScreen = () => {
       patrimony: patrimony.trim(),
       category,
       balance: patrimony ? 1 : balance,
-      minimum,
       measure,
       description,
-    });
+   });
   };
 
   return (
@@ -135,7 +130,7 @@ const OperationalScreen = () => {
                       >
                         <span className="font-bold">{item.name}</span>{" "}
                         <span className="text-gray-500 text-xs">
-                          ({item.category})
+                          ({item.Category?.name})
                         </span>
                       </div>
                     ))}
@@ -208,15 +203,7 @@ const OperationalScreen = () => {
                   itemExistente ? "opacity-50 pointer-events-none" : ""
                 }
               >
-                <label className="block text-sm font-semibold text-gray-700">
-                  Mínimo (Alerta)
-                </label>
-                <input
-                  type="number"
-                  value={minimum}
-                  onChange={(e) => setMinimum(Number(e.target.value))}
-                  className="mt-1 block w-full p-2 border rounded-md"
-                />
+               
               </div>
 
               <div

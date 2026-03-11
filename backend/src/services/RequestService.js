@@ -1,6 +1,7 @@
 const Request = require("../model/Request");
 const Item = require("../model/Item");
 const User = require("../model/User");
+const Category = require("../model/Category");
 
 class RequestService {
   async createRequest(data) {
@@ -25,9 +26,13 @@ class RequestService {
       include: [{ model: Item, as: "item" }],
     });
 
-    if (!request) throw new Error("Requisição não encontrada.");
-    if (request.status !== "pendente")
+    if (!request) {
+      throw new Error("Requisição não encontrada.");
+    }
+
+    if (request.status !== "pendente") {
       throw new Error("Esta requisição já foi processada.");
+    }
 
     const item = request.item;
 
@@ -35,19 +40,27 @@ class RequestService {
       throw new Error("Estoque insuficiente para aprovar agora!");
     }
 
-    await item.update({ balance: item.balance - request.quantity });
-
-    await request.update({ status: "aprovado" });
-
-    const saldoTotalCategoria = await Item.sum("balance", {
-      where: { category: item.category },
+    await item.update({
+      balance: item.balance - request.quantity,
     });
 
-    if (saldoTotalCategoria <= item.minimum) {
+    await request.update({
+      status: "aprovado",
+    });
+
+    const category = await Category.findByPk(item.category_id);
+
+    const saldoTotalCategoria = await Item.sum("balance", {
+      where: { category_id: item.category_id },
+    });
+
+    
+    if (saldoTotalCategoria <= category.minimum) {
       console.log(`\n🚨 [ALERTA DE COMPRAS - TrixStock]`);
       console.log(`Requisição do ID ${request.id} aprovada.`);
-      console.log(`A categoria ${item.category} atingiu o limite mínimo!`);
-      console.log(`Saldo atual: ${saldoTotalCategoria}\n`);
+      console.log(`Categoria: ${category.name}`);
+      console.log(`Saldo atual da categoria: ${saldoTotalCategoria}`);
+      console.log(`Mínimo definido: ${category.minimum}\n`);
     }
 
     return request;

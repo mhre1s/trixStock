@@ -1,6 +1,6 @@
-const  Item  = require("../model/Item");
+const Item = require("../model/Item");
 const { Op } = require("sequelize");
-console.log("O Item tem o método findOne?", typeof Item.findOne);
+const Category = require("../model/Category");
 
 class ItemService {
   async createItem(data) {
@@ -24,7 +24,7 @@ class ItemService {
       return await Item.create({
         name: formattedName,
         patrimony,
-        category: data.category,
+        category_id: data.category_id,
         unit_of_measure: data.measure,
         description: data.description,
         balance: 1,
@@ -36,6 +36,7 @@ class ItemService {
       where: {
         name: formattedName,
         patrimony: null,
+        category_id: data.category_id,
       },
     });
 
@@ -50,7 +51,7 @@ class ItemService {
     return await Item.create({
       name: formattedName,
       patrimony: null,
-      category: data.category,
+      category_id: data.category_id,
       unit_of_measure: data.measure,
       description: data.description,
       balance: Number(data.balance || 0),
@@ -58,39 +59,61 @@ class ItemService {
   }
 
   async getItems(filters) {
-    const { q, category } = filters;
+    const { q, category_id } = filters;
+
     let whereClause = {};
 
     if (q) {
       whereClause.name = { [Op.iLike]: `%${q}%` };
     }
-    if (category) {
-      whereClause.category = category;
+
+    if (category_id) {
+      whereClause.category_id = category_id;
     }
+
     return await Item.findAll({
       where: whereClause,
+      include: Category,
       order: [["name", "ASC"]],
     });
   }
 
   async deleteQuantity(id, quantity) {
     const qty = Number(quantity);
+
     const item = await Item.findByPk(id);
+
     if (!item) {
       throw new Error("item não encontrado");
     }
+
     if (item.balance < qty) {
       throw new Error("Estoque insuficiente");
     }
 
-    item.balance -= qty;
     await item.decrement("balance", { by: qty });
     await item.reload();
+
     return item;
   }
 
   async updateItem(data, id) {
     return await Item.update(data, { where: { id } });
+  }
+
+  async getCategoryStock(categoryId) {
+    const total = await Item.sum("balance", {
+      where: { category_id: categoryId },
+    });
+
+    const category = await Category.findByPk(categoryId);
+
+    return {
+      category: category.name,
+      total,
+      minimum: category.minimum,
+      lowStock: total < category.minimum,
+    };
   }
 }
 
