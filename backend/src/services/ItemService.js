@@ -120,7 +120,6 @@ class ItemService {
       include: {
         model: require("../model/Item"),
         attributes: ["id", "name", "balance", "unit_of_measure"],
-        order: [["name", "ASC"]],
       },
       order: [["name", "ASC"]],
     });

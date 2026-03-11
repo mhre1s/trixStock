@@ -18,14 +18,14 @@ const CategoryTable = () => {
 
   return (
     <div className="p-6">
-      {data.map((cat) => (
+      {data?.map((cat) => (
         <div key={cat.id} className="mb-6">
           <h2 className="font-bold text-lg">
             {cat.name} ({cat.total}){" "}
             {cat.lowStock && <span className="text-red-600">⚠️</span>}
           </h2>
           <ul className="ml-4 list-disc">
-            {cat.items.map((item) => (
+            {cat.items?.map((item) => (
               <li key={item.id}>
                 {item.name} - {item.balance} {item.unit_of_measure}
               </li>
