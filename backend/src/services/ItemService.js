@@ -5,14 +5,56 @@ console.log("O Item tem o método findOne?", typeof Item.findOne);
 class ItemService {
   async createItem(data) {
     const formattedName = data.name.trim().toUpperCase();
-    const existentItem = await Item.findOne({ where: { name: formattedName } });
 
-    if (existentItem) {
-      const novoSaldo = existentItem.balance + parseInt(data.balance);
-      return await existentItem.update({ balance: novoSaldo });
+    const patrimony =
+      data.patrimony && data.patrimony.trim() !== ""
+        ? data.patrimony.trim()
+        : null;
+
+    // ITEM COM SERIAL
+    if (patrimony !== null) {
+      const existingSN = await Item.findOne({
+        where: { patrimony },
+      });
+
+      if (existingSN) {
+        throw new Error("Esse serial já está cadastrado.");
+      }
+
+      return await Item.create({
+        name: formattedName,
+        patrimony,
+        category: data.category,
+        unit_of_measure: data.measure,
+        description: data.description,
+        balance: 1,
+      });
     }
 
-    return await Item.create(data);
+    // ITEM SEM SERIAL
+    const existentItem = await Item.findOne({
+      where: {
+        name: formattedName,
+        patrimony: null,
+      },
+    });
+
+    if (existentItem) {
+      const novoSaldo = existentItem.balance + Number(data.balance || 0);
+
+      return await existentItem.update({
+        balance: novoSaldo,
+      });
+    }
+
+    return await Item.create({
+      name: formattedName,
+      patrimony: null,
+      category: data.category,
+      unit_of_measure: data.measure,
+      description: data.description,
+      balance: Number(data.balance || 0),
+    });
   }
 
   async getItems(filters) {
@@ -31,20 +73,20 @@ class ItemService {
     });
   }
 
-  async deleteQuantity(id,quantity) {
-    const qty = Number(quantity)
+  async deleteQuantity(id, quantity) {
+    const qty = Number(quantity);
     const item = await Item.findByPk(id);
-    if(!item){
-      throw new Error("item não encontrado")
+    if (!item) {
+      throw new Error("item não encontrado");
     }
-     if (item.balance < qty) {
-       throw new Error("Estoque insuficiente");
-     }
+    if (item.balance < qty) {
+      throw new Error("Estoque insuficiente");
+    }
 
-     item.balance -= qty
-     await item.decrement('balance',{by:qty})
-     await item.reload();
-     return item
+    item.balance -= qty;
+    await item.decrement("balance", { by: qty });
+    await item.reload();
+    return item;
   }
 
   async updateItem(data, id) {

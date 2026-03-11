@@ -13,13 +13,8 @@ const Item = sequelize.define(
       type: DataTypes.STRING,
       allowNull: true,
     },
-    category:{
-        type: DataTypes.ENUM(
-            "Onu", 
-            "Escritorio", 
-            "Cabeamento", 
-            "Ferramentas"
-        )
+    category: {
+      type: DataTypes.ENUM("Onu", "Escritorio", "Cabeamento", "Ferramentas"),
     },
     patrimony: {
       type: DataTypes.STRING,
@@ -32,9 +27,9 @@ const Item = sequelize.define(
       defaultValue: 0,
     },
     unit_of_measure: {
-      type: DataTypes.ENUM("unid", "metros", "pacote", "caixa", "litro"),
+      type: DataTypes.ENUM("Unidade", "Metros", "Pacote", "Caixa", "Litro"),
       allowNull: false,
-      defaultValue: "unid",
+      defaultValue: "Unidade",
     },
     minimum: {
       type: DataTypes.INTEGER,

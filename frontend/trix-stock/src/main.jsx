@@ -6,6 +6,8 @@ import './index.css'
 import LoginScreen from './pages/loginScreen';
 import AuthLayout from './layouts/AuthLayout';
 import RegisterScreen from './pages/RegisterScreen';
+import SystemLayout from './layouts/SystemLayout';
+import Warehouse from './pages/WarehouseScreen';
 
 
 const queryClient = new QueryClient()
@@ -17,6 +19,9 @@ createRoot(document.getElementById("root")).render(
         <Route element={<AuthLayout />}>
           <Route path="/" element={<LoginScreen />} />
           <Route path="/register" element={<RegisterScreen />} />
+        </Route>
+        <Route element={<SystemLayout/>}>
+          <Route path='/itemregister' element={<Warehouse/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
