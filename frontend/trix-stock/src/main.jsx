@@ -8,6 +8,7 @@ import AuthLayout from './layouts/AuthLayout';
 import RegisterScreen from './pages/RegisterScreen';
 import SystemLayout from './layouts/SystemLayout';
 import Warehouse from './pages/WarehouseScreen';
+import OperationalScreen from './pages/OperationalScreen';
 
 
 const queryClient = new QueryClient()
@@ -22,6 +23,7 @@ createRoot(document.getElementById("root")).render(
         </Route>
         <Route element={<SystemLayout/>}>
           <Route path='/itemregister' element={<Warehouse/>}/>
+          <Route path='/operational' element={<OperationalScreen/>}/>
         </Route>
       </Routes>
     </BrowserRouter>
