@@ -1,6 +1,6 @@
-const Item = require("../model/Item");
+
 const { Op } = require("sequelize");
-const Category = require("../model/Category");
+const { Item, Category } = require("../model/index"); 
 
 class ItemService {
   async createItem(data) {
@@ -116,27 +116,41 @@ class ItemService {
     };
   }
   async getItemsGroupedByCategory() {
-    const categories = await Category.findAll({
-      include: {
-        model: require("../model/Item"),
-        attributes: ["id", "name", "balance", "unit_of_measure"],
-      },
-      order: [["name", "ASC"]],
-    });
+    try {
+      const categories = await Category.findAll({
+        include: [
+          {
+            model: Item,
+            attributes: ["id", "name", "balance"], 
+          },
+        ],
+        order: [["name", "ASC"]],
+      });
 
-    return categories.map((cat) => ({
-      id: cat.id,
-      name: cat.name,
-      minimum: cat.minimum,
-      total: cat.Items.reduce((acc, i) => acc + i.balance, 0),
-      lowStock: cat.Items.reduce((acc, i) => acc + i.balance, 0) < cat.minimum,
-      items: cat.Items.map((i) => ({
-        id: i.id,
-        name: i.name,
-        balance: i.balance,
-        unit_of_measure: i.unit_of_measure,
-      })),
-    }));
+      return categories.map((cat) => {
+        const itemsList = cat.Items || [];
+        const totalBalance = itemsList.reduce(
+          (acc, i) => acc + (Number(i.balance) || 0),
+          0,
+        );
+
+        return {
+          id: cat.id,
+          name: cat.name,
+          minimum: cat.minimum || 0,
+          total: totalBalance,
+          lowStock: totalBalance < (cat.minimum || 0),
+          items: itemsList.map((i) => ({
+            id: i.id,
+            name: i.name,
+            balance: i.balance,
+          })),
+        };
+      });
+    } catch (error) {
+      console.error("ERRO NO BACKEND:", error);
+      throw error;
+    }
   }
 }
 

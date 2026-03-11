@@ -12,7 +12,6 @@ const OperationalScreen = () => {
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState(1);
   const [balance, setBalance] = useState(0);
-  const [measure, setMeasure] = useState("Unid");
   const [description, setDescription] = useState("");
 
  
@@ -48,7 +47,6 @@ const OperationalScreen = () => {
   const selecionarSugestao = (item) => {
     setName(item.name);
     setCategory(item.category_id);;
-    setMeasure(item.measure);
   };
 
   const closeModal = () => {
@@ -66,7 +64,6 @@ const OperationalScreen = () => {
       patrimony: patrimony.trim(),
       category_id: category,
       balance: patrimony ? 1 : balance,
-      measure,
       description,
     });
   };
@@ -198,28 +195,6 @@ const OperationalScreen = () => {
                   itemExistente ? "opacity-50 pointer-events-none" : ""
                 }
               ></div>
-
-              <div
-                className={
-                  itemExistente ? "opacity-50 pointer-events-none" : ""
-                }
-              >
-                <label className="block text-sm font-semibold text-gray-700">
-                  Unid. Medida
-                </label>
-                <select
-                  value={measure}
-                  onChange={(e) => setMeasure(e.target.value)}
-                  className="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none bg-white"
-                >
-                  <option value="Unidade">Unidade</option>
-                  <option value="Metros">Metros</option>
-                  <option value="Pacote">Pacote</option>
-                  <option value="Caixa">Caixa</option>
-                  <option value="Litro">Litro</option>
-                </select>
-              </div>
-
               <div className="md:col-span-2">
                 <label className="block text-sm font-semibold text-gray-700">
                   Descrição Curta
