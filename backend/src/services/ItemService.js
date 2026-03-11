@@ -30,8 +30,6 @@ class ItemService {
         balance: 1,
       });
     }
-
-    // ITEM SEM SERIAL
     const existentItem = await Item.findOne({
       where: {
         name: formattedName,
@@ -121,7 +119,6 @@ class ItemService {
         include: [
           {
             model: Item,
-            // 1. Verifique se estes nomes batem EXATAMENTE com o seu Item.js
             attributes: ["id", "name", "balance", "description", "patrimony"],
           },
         ],
@@ -144,15 +141,14 @@ class ItemService {
           total: totalBalance,
           lowStock: totalBalance < (cat.minimum || 0),
           items: itemsList.map((i) => {
-            // 2. O PULO DO GATO: Converte o objeto complexo do Sequelize em um objeto JS puro
             const itemPuro = i.get({ plain: true });
 
             return {
               id: itemPuro.id,
               name: itemPuro.name,
               balance: itemPuro.balance,
-              description: itemPuro.description, // Agora ele vai aparecer no JSON
-              patrimony: itemPuro.patrimony, // Agora ele vai aparecer no JSON
+              description: itemPuro.description, 
+              patrimony: itemPuro.patrimony,
             };
           }),
         };

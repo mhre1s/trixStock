@@ -1,7 +1,7 @@
 import { useState } from "react";
 import React from "react";
 import { useQuery } from "@tanstack/react-query";
-import { getItemsByCategory } from "../apis/itemApi"; // Ajuste o caminho se necessário
+import { getItemsByCategory } from "../apis/itemApi";
 
 const CategoryTable = () => {
   const [expandedId, setExpandedId] = useState(null);
@@ -43,7 +43,6 @@ const CategoryTable = () => {
           <tbody className="divide-y divide-gray-200">
             {data?.map((cat) => (
               <React.Fragment key={cat.id}>
-                {/* Linha da Categoria */}
                 <tr
                   className="hover:bg-gray-50 transition-colors cursor-pointer"
                   onClick={() => toggleCategory(cat.id)}
@@ -71,8 +70,6 @@ const CategoryTable = () => {
                     </button>
                   </td>
                 </tr>
-
-                {/* Linha Detalhada (Sub-tabela de Itens) */}
                 {expandedId === cat.id && (
                   <tr>
                     <td colSpan="4" className="bg-gray-50 px-10 py-4">

@@ -42,7 +42,6 @@ const RegisterScreen = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          {/* Input Nome Completo */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="name"
@@ -61,8 +60,6 @@ const RegisterScreen = () => {
               required
             />
           </div>
-
-          {/* Input Usuário */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="user"
@@ -81,8 +78,6 @@ const RegisterScreen = () => {
               required
             />
           </div>
-
-          {/* Input Senha */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="password"
@@ -102,8 +97,6 @@ const RegisterScreen = () => {
               required
             />
           </div>
-
-          {/* Menu Dropdown Nível */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="level"
@@ -123,9 +116,7 @@ const RegisterScreen = () => {
               <option value="gestão">Gestão</option>
             </select>
           </div>
-
-          {/* Botão de Enviar */}
-          <button
+         <button
             type="submit"
             disabled={mutation.isPending}
             className={`w-full py-3 mt-4 font-semibold rounded-lg shadow-md transition-all 
@@ -163,8 +154,6 @@ const RegisterScreen = () => {
             )}
           </button>
         </form>
-
-        {/* Rodapé do Card */}
         <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-600">
           <p>
             Já possui uma conta?{" "}

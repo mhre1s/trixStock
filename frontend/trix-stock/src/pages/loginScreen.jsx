@@ -22,9 +22,7 @@ const LoginSreen = () => {
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Login
         </h1>
-
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          {/* Campo de Usuário */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="user"
@@ -42,8 +40,6 @@ const LoginSreen = () => {
               type="text"
             />
           </div>
-
-          {/* Campo de Senha */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="password"
@@ -62,8 +58,6 @@ const LoginSreen = () => {
               type="password"
             />
           </div>
-
-          {/* Mensagem de Erro (Espaço reservado para não mover o layout) */}
           <div className="h-5 text-center">
             {errorMsg && (
               <p className="text-sm text-red-500 font-medium animate-bounce">
@@ -71,8 +65,6 @@ const LoginSreen = () => {
               </p>
             )}
           </div>
-
-          {/* Botão de Entrar */}
           <button
             type="submit"
             className="w-full py-3 mt-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md
@@ -81,8 +73,6 @@ const LoginSreen = () => {
             Entrar
           </button>
         </form>
-
-        {/* Rodapé do Card */}
         <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-600">
           <p>
             Ainda não tem conta?{" "}

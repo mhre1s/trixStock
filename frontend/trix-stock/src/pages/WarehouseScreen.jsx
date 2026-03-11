@@ -1,13 +1,12 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { registerItem, getItems } from "../apis/itemApi"; // Certifique-se de que getItems está exportado
+import { registerItem, getItems } from "../apis/itemApi";
 import CategoryTable from "../components/CategoryTable";
 
 const OperationalScreen = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Estados do formulário
   const [name, setName] = useState("");
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState(1);
