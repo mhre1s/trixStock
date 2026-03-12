@@ -2,44 +2,31 @@ const Request = require("../model/Request");
 const Item = require("../model/Item");
 const User = require("../model/User");
 const Category = require("../model/Category");
+const { Op } = require("sequelize");
 
 class RequestService {
   async createRequest(data) {
     const { itemName, quantity } = data;
     const qtyRequested = Number(quantity) || 1;
 
-    // 1. BUSCA O PRIMEIRO ITEM DISPONÍVEL COM ESSE NOME
-    // Ordenamos pelo ID para pegar o mais antigo (FIFO)
+    console.log(`Buscando item: ${itemName} com quantidade: ${qtyRequested}`);
     const itemDisponivel = await Item.findOne({
       where: {
-        name: itemName,
-        balance: { [Op.gte]: qtyRequested }, // Garante que tem saldo suficiente
+        name: { [Op.iLike]: itemName.trim() }, 
+        balance: { [Op.gte]: qtyRequested },
       },
       order: [["id", "ASC"]],
     });
-
-    // 2. SE NÃO ACHAR, RETORNA O ERRO QUE VOCÊ VIU
     if (!itemDisponivel) {
-      throw new Error(
-        "Item não encontrado ou estoque insuficiente para " + itemName,
-      );
+      throw new Error(`Item "${itemName}" não encontrado ou estoque insuficiente.`);
     }
-
-    // 3. ABATE O SALDO NO ESTOQUE
-    // Se for item com serial, o balance vai de 1 para 0
-    // Se for cabo, abate a quantidade solicitada
-    itemDisponivel.balance -= qtyRequested;
-    await itemDisponivel.save();
-
-    // 4. CRIA A SOLICITAÇÃO VINCULANDO O ID REAL DO ITEM
+     await itemDisponivel.save();
     return await Request.create({
       item_id: itemDisponivel.id,
       quantity: qtyRequested,
-      status: "PENDENTE",
-      // user_id: data.userId (se você já tiver autenticação)
-    });
+      status: "pendente", 
+    })
   }
-
   async approveRequest(requestId) {
     const request = await Request.findByPk(requestId, {
       include: [{ model: Item, as: "item" }],
