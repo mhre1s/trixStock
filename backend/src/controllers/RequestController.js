@@ -5,7 +5,10 @@ class RequestController {
   async store(req, res) {
     try {
       
-      const request = await RequestService.createRequest(req.body);
+      const request = await RequestService.createRequest({
+        ...req.body,
+        user_id: 1,
+      });;
 
       return res.status(201).json({
         message:

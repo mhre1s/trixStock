@@ -21,7 +21,6 @@ const ItemCatalog = () => {
     onSuccess: () => {
       alert(`Solicitação de "${selectedItemName}" enviada com sucesso!`);
       setIsModalOpen(false);
-      // Invalida o cache para atualizar as quantidades se necessário
       queryClient.invalidateQueries(["itemsByCategory"]);
     },
     onError: (err) => {
