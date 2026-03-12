@@ -9,28 +9,28 @@ class RequestService {
     const { itemName, quantity, user_id } = data; 
     const qtyRequested = Number(quantity) || 1;
     const searchName = itemName.trim().toUpperCase();
-    console.log(`Buscando item: ${searchName} para o usuário: ${user_id}`);
-
-    const itemDisponivel = await Item.findOne({
+    const totalBalance = await Item.sum('balance', {
       where: {
-        name: searchName,
-        balance: { [Op.gte]: qtyRequested },
-      },
-      order: [["id", "ASC"]],
+        name: searchName
+      }
     });
-
-    if (!itemDisponivel) {
+    if (!totalBalance || totalBalance < qtyRequested) {
       throw new Error(
-        `Item "${itemName}" não encontrado ou estoque insuficiente.`,
+        `Estoque insuficiente para "${itemName}". Disponível: ${totalBalance || 0}`,
       );
     }
 
-    return await Request.create({
-      item_id: itemDisponivel.id,
-      user_id: user_id || 1, 
-      quantity: qtyRequested,
-      status: "pendente",
+    const referenciaItem = await Item.findOne({
+      where: { name: searchName },
+      order: [["id", "ASC"]],
     });
+    return await Request.create({
+      item_id: referenciaItem.id, 
+      user_id,
+      quantity: qtyRequested,
+      status: 'pendente'
+    });
+
   }
   async approveRequest(requestId) {
     const request = await Request.findByPk(requestId, {
@@ -66,7 +66,7 @@ class RequestService {
     });
 
     if (saldoTotalCategoria <= category.minimum) {
-      console.log(`\n🚨 [ALERTA DE COMPRAS - TrixStock]`);
+      console.log(`[ALERTA DE COMPRAS - TrixStock]`);
       console.log(`Requisição do ID ${request.id} aprovada.`);
       console.log(`Categoria: ${category.name}`);
       console.log(`Saldo atual da categoria: ${saldoTotalCategoria}`);
