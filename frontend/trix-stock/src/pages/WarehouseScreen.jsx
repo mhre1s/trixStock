@@ -9,6 +9,7 @@ const OperationalScreen = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const [name, setName] = useState("");
+  const [tableSearch, setTableSearch] = useState("");
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState(1);
   const [balance, setBalance] = useState(0);
@@ -122,7 +123,14 @@ const OperationalScreen = () => {
               <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
                 📦 Inventário por Categoria
               </h2>
-              <CategoryTable />
+              <input 
+                type="text" 
+                placeholder="Buscar item..." 
+                value={tableSearch} 
+                onChange={(e) => setTableSearch(e.target.value)}
+                className="p-2 border rounded shadow-sm mb-4 w-full md:w-80"
+              />
+              <CategoryTable searchTerm={tableSearch} />
             </section>
           </div>
           <div className="lg:col-span-1">
