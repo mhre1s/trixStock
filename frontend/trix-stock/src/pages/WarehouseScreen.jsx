@@ -77,12 +77,27 @@ const OperationalScreen = () => {
   };
   const handleSubmit = (e) => {
     e.preventDefault();
+    const serials = patrimony
+      ? patrimony
+          .split(/[;]+/)
+          .map((s) => s.trim())
+          .filter((s) => s !== "")
+      : [];
+    const qtyTotal = patrimony ? serials.length : balance;
+    if (
+      patrimony &&
+      qtyTotal !== Number(balance) &&
+      !patrimony.includes(serials[0])
+    ) {
+    }
+
     registerMutation.mutate({
       name,
-      patrimony: patrimony.trim(),
       category_id: category,
-      balance: patrimony ? 1 : balance,
       description,
+      serials: serials,
+      balance: qtyTotal,
+      patrimony: patrimony.trim(),
     });
   };
 

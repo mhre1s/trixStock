@@ -5,11 +5,51 @@ const { Item, Category } = require("../model/index");
 class ItemService {
   async createItem(data) {
     const formattedName = data.name.trim().toUpperCase();
+    if (
+      data.patrimony &&
+      (data.patrimony.includes(",") || data.patrimony.includes(";"))
+    ) {
+      const serials = data.patrimony
+        .split(/[;]+/)
+        .map((s) => s.trim())
+        .filter((s) => s !== "");
+
+      const qtyInformada = Number(data.balance);
+      if (serials.length !== qtyInformada) {
+        throw new Error(
+          `Conflito: Você informou ${serials.length} seriais no campo patrimônio, mas a quantidade definida foi ${qtyInformada}.`,
+        );
+      }
+      const existing = await Item.findOne({
+        where: { patrimony: { [Op.in]: serials } },
+      });
+
+      if (existing) {
+        throw new Error(
+          `O serial "${existing.patrimony}" já está cadastrado no sistema.`,
+        );
+      }
+      const createdItems = await Promise.all(
+        serials.map((sn) =>
+          Item.create({
+            name: formattedName,
+            patrimony: sn,
+            category_id: data.category_id,
+            unit_of_measure: data.measure,
+            description: data.description,
+            balance: 1, 
+          }),
+        ),
+      );
+
+      return createdItems[0]; 
+    }
 
     const patrimony =
       data.patrimony && data.patrimony.trim() !== ""
         ? data.patrimony.trim()
         : null;
+
     if (patrimony !== null) {
       const existingSN = await Item.findOne({
         where: { patrimony },
@@ -43,7 +83,6 @@ class ItemService {
         balance: novoSaldo,
       });
     }
-
     return await Item.create({
       name: formattedName,
       patrimony: null,
@@ -142,7 +181,7 @@ class ItemService {
               id: itemPuro.id,
               name: itemPuro.name,
               balance: itemPuro.balance,
-              description: itemPuro.description, 
+              description: itemPuro.description,
               patrimony: itemPuro.patrimony,
             };
           }),
