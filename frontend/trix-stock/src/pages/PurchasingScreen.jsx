@@ -32,7 +32,7 @@ const PurchasingScreen = () => {
 
           return acc;
         }, {}),
-      ).filter((c) => c.totalBalance <= c.minimum)
+      ).filter((c) => c.totalBalance < c.minimum)
     : [];
 
   return (
