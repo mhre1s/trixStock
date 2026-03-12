@@ -1,30 +1,26 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { registerItem, getItems } from "../apis/itemApi";
-import { getRequests, approveRequest, rejectRequest } from "../apis/requestApi"; // Certifique-se de criar/exportar essas funções na sua API
+import { getRequests, approveRequest, rejectRequest } from "../apis/requestApi"; 
 import CategoryTable from "../components/CategoryTable";
 
 const OperationalScreen = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  // Estados do Formulário (Mantidos)
   const [name, setName] = useState("");
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState(1);
   const [balance, setBalance] = useState(0);
   const [description, setDescription] = useState("");
 
-  // Queries
   const { data: items } = useQuery({ queryKey: ["items"], queryFn: getItems });
 
-  // BUSCA AS SOLICITAÇÕES
   const { data: requests, isLoading: loadingReqs } = useQuery({
     queryKey: ["requests"],
     queryFn: getRequests,
   });
 
-  // MUTATIONS (Ações do Almoxarifado)
   const approveMutation = useMutation({
     mutationFn: approveRequest,
     onSuccess: () => {
@@ -50,13 +46,22 @@ const OperationalScreen = () => {
     },
   });
 
-  // Lógica de sugestões (Mantida)
-  const sugestoes =
-    name.length > 1
-      ? items?.filter((i) => i.name.toUpperCase().includes(name.toUpperCase()))
-      : [];
+ const formatForSearch = (str) => str.replace(/\s+/g, "").toUpperCase();
+ const termoLimpo = formatForSearch(name);
+ const sugestoes =
+   name.length > 1
+     ? [
+         ...new Set(
+           items
+             ?.filter((i) => formatForSearch(i.name).includes(termoLimpo))
+             .map((i) => i.name),
+         ),
+       ]
+         .map((nomeUnico) => items.find((i) => i.name === nomeUnico))
+         .slice(0, 5)
+     : [];
   const itemExistente = items?.find(
-    (i) => i.name.toUpperCase() === name.toUpperCase(),
+    (i) => formatForSearch(i.name) === termoLimpo,
   );
 
   const selecionarSugestao = (item) => {
@@ -84,7 +89,6 @@ const OperationalScreen = () => {
   return (
     <div className="p-6 bg-gray-100 min-h-screen font-sans">
       <div className="max-w-6xl mx-auto">
-        {/* HEADER */}
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Painel Almoxarifado
@@ -98,7 +102,6 @@ const OperationalScreen = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* COLUNA DA ESQUERDA: TABELAS DE ESTOQUE */}
           <div className="lg:col-span-2 space-y-8">
             <section className="bg-white p-4 rounded-2xl shadow-sm border border-gray-200">
               <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
@@ -107,8 +110,6 @@ const OperationalScreen = () => {
               <CategoryTable />
             </section>
           </div>
-
-          {/* COLUNA DA DIREITA: SOLICITAÇÕES PENDENTES */}
           <div className="lg:col-span-1">
             <section className="bg-white p-5 rounded-2xl shadow-md border-t-4 border-orange-400 sticky top-6">
               <h2 className="text-xl font-bold text-gray-800 mb-4 flex justify-between items-center">
@@ -178,26 +179,23 @@ const OperationalScreen = () => {
           </div>
         </div>
       </div>
-
-      {/* MODAL DE ENTRADA (Mantida com os estilos originais) */}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-200">
-            {/* ... conteúdo do form que você já tinha ... */}
             <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
-              <h2 className="text-lg font-bold">Gerenciar Estoque</h2>
+              <h2 className="text-lg font-bold">Nova Entrada de Estoque</h2>
               <button
                 onClick={closeModal}
-                className="text-2xl hover:text-gray-200 cursor-pointer"
+                className="text-2xl hover:text-gray-200"
               >
                 &times;
               </button>
             </div>
+
             <form
               onSubmit={handleSubmit}
               className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
             >
-              {/* (Mesmos campos de Nome, Patrimônio, etc) */}
               <div className="md:col-span-2 relative">
                 <label className="block text-sm font-semibold text-gray-700">
                   Nome do Item
@@ -205,12 +203,80 @@ const OperationalScreen = () => {
                 <input
                   required
                   type="text"
+                  placeholder="Ex: ONU ZTE, Roteador TP-Link..."
                   value={name}
                   onChange={(e) => setName(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded-md focus:ring-2 focus:ring-blue-500 outline-none"
+                />
+                {sugestoes.length > 0 && !itemExistente && (
+                  <div className="absolute z-10 w-full bg-white border rounded-md shadow-lg mt-1 max-h-40 overflow-y-auto">
+                    {sugestoes.map((item) => (
+                      <div
+                        key={item.id}
+                        className="p-2 hover:bg-gray-100 cursor-pointer text-sm"
+                        onClick={() => selecionarSugestao(item)}
+                      >
+                        {item.name} (Sugerido)
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Categoria
+                </label>
+                <select
+                  value={category}
+                  onChange={(e) => setCategory(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded-md"
+                >
+                  <option value={1}>ONU</option>
+                  <option value={2}>Roteador</option>
+                  <option value={3}>Cabo/Fibra</option>
+                  <option value={4}>Conectores</option>
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Patrimônio / SN (Opcional)
+                </label>
+                <input
+                  type="text"
+                  placeholder="Deixe vazio se não houver serial"
+                  value={patrimony}
+                  onChange={(e) => setPatrimony(e.target.value)}
                   className="mt-1 block w-full p-2 border rounded-md"
                 />
               </div>
-              {/* ... resto do form ... */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Quantidade {patrimony ? "(SN detectado: 1 un.)" : ""}
+                </label>
+                <input
+                  type="number"
+                  disabled={!!patrimony}
+                  value={patrimony ? 1 : balance}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    setBalance(val === "" ? "" : Number(val));
+                  }}
+                  className={`mt-1 block w-full p-2 border rounded-md ${patrimony ? "bg-gray-100" : ""}`}
+                />
+              </div>
+
+              <div className="md:col-span-2">
+                <label className="block text-sm font-semibold text-gray-700">
+                  Descrição/Obs
+                </label>
+                <textarea
+                  value={description}
+                  onChange={(e) => setDescription(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded-md"
+                  rows="2"
+                ></textarea>
+              </div>
+
               <div className="md:col-span-2 flex justify-end gap-3 mt-4">
                 <button
                   type="button"
@@ -221,7 +287,7 @@ const OperationalScreen = () => {
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 text-white px-6 py-2 rounded-lg font-bold"
+                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-colors"
                 >
                   Salvar no Estoque
                 </button>
