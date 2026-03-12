@@ -6,13 +6,13 @@ const { Op } = require("sequelize");
 
 class RequestService {
   async createRequest(data) {
-    const { itemName, quantity, user_id } = data; 
+    const { itemName, quantity, user_id } = data;
     const qtyRequested = Number(quantity) || 1;
     const searchName = itemName.trim().toUpperCase();
-    const totalBalance = await Item.sum('balance', {
+    const totalBalance = await Item.sum("balance", {
       where: {
-        name: searchName
-      }
+        name: searchName,
+      },
     });
     if (!totalBalance || totalBalance < qtyRequested) {
       throw new Error(
@@ -25,53 +25,50 @@ class RequestService {
       order: [["id", "ASC"]],
     });
     return await Request.create({
-      item_id: referenciaItem.id, 
+      item_id: referenciaItem.id,
       user_id,
       quantity: qtyRequested,
-      status: 'pendente'
+      status: "pendente",
     });
-
   }
   async approveRequest(requestId) {
     const request = await Request.findByPk(requestId, {
       include: [{ model: Item, as: "item" }],
     });
 
-    if (!request) {
-      throw new Error("Requisição não encontrada.");
+    if (!request || request.status !== "pendente") {
+      throw new Error("Solicitação não encontrada ou já processada.");
     }
-
-    if (request.status !== "pendente") {
-      throw new Error("Esta requisição já foi processada.");
-    }
-
-    const item = request.item;
-
-    if (item.balance < request.quantity) {
-      throw new Error("Estoque insuficiente para aprovar agora!");
-    }
-
-    await item.update({
-      balance: item.balance - request.quantity,
+    const itensDisponiveis = await Item.findAll({
+      where: {
+        name: request.item.name,
+        balance: { [Op.gt]: 0 },
+      },
+      order: [["id", "ASC"]],
     });
-
-    await request.update({
-      status: "aprovado",
-    });
-
-    const category = await Category.findByPk(item.category_id);
-
-    const saldoTotalCategoria = await Item.sum("balance", {
-      where: { category_id: item.category_id },
-    });
-
-    if (saldoTotalCategoria <= category.minimum) {
-      console.log(`[ALERTA DE COMPRAS - TrixStock]`);
-      console.log(`Requisição do ID ${request.id} aprovada.`);
-      console.log(`Categoria: ${category.name}`);
-      console.log(`Saldo atual da categoria: ${saldoTotalCategoria}`);
-      console.log(`Mínimo definido: ${category.minimum}\n`);
+    const totalEstoque = itensDisponiveis.reduce(
+      (sum, i) => sum + i.balance,
+      0,
+    );
+    if (totalEstoque < request.quantity) {
+      throw new Error("Estoque insuficiente no momento da aprovação.");
     }
+    let quantidadeParaAbater = request.quantity;
+
+    for (const item of itensDisponiveis) {
+      if (quantidadeParaAbater <= 0) break;
+
+      if (item.balance <= quantidadeParaAbater) {
+        quantidadeParaAbater -= item.balance;
+        item.balance = 0;
+      } else {
+        item.balance -= quantidadeParaAbater;
+        quantidadeParaAbater = 0;
+      }
+      await item.save(); 
+    }
+    request.status = "aprovado";
+    await request.save();
 
     return request;
   }
