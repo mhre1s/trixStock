@@ -6,26 +6,31 @@ const { Op } = require("sequelize");
 
 class RequestService {
   async createRequest(data) {
-    const { itemName, quantity } = data;
+    const { itemName, quantity, user_id } = data; 
     const qtyRequested = Number(quantity) || 1;
+    const searchName = itemName.trim().toUpperCase();
+    console.log(`Buscando item: ${searchName} para o usuário: ${user_id}`);
 
-    console.log(`Buscando item: ${itemName} com quantidade: ${qtyRequested}`);
     const itemDisponivel = await Item.findOne({
       where: {
-        name: { [Op.iLike]: itemName.trim() }, 
+        name: searchName,
         balance: { [Op.gte]: qtyRequested },
       },
       order: [["id", "ASC"]],
     });
+
     if (!itemDisponivel) {
-      throw new Error(`Item "${itemName}" não encontrado ou estoque insuficiente.`);
+      throw new Error(
+        `Item "${itemName}" não encontrado ou estoque insuficiente.`,
+      );
     }
-     await itemDisponivel.save();
+
     return await Request.create({
       item_id: itemDisponivel.id,
+      user_id: user_id || 1, 
       quantity: qtyRequested,
-      status: "pendente", 
-    })
+      status: "pendente",
+    });
   }
   async approveRequest(requestId) {
     const request = await Request.findByPk(requestId, {

@@ -1,18 +1,14 @@
 const RequestService = require("../services/RequestService");
 
 class RequestController {
-  
   async store(req, res) {
     try {
-      
       const request = await RequestService.createRequest({
         ...req.body,
-        user_id: 1,
-      });;
-
+        user_id: 1, 
+      });
       return res.status(201).json({
-        message:
-          "Solicitação enviada com sucesso! Aguarde a aprovação do almoxarifado.",
+        message: "Solicitação enviada com sucesso!",
         request,
       });
     } catch (error) {
@@ -20,19 +16,18 @@ class RequestController {
     }
   }
 
-  
   async index(req, res) {
     try {
       const requests = await RequestService.getRequest();
       return res.status(200).json(requests);
     } catch (error) {
-      return res.status(500).json({ error: error.message});
+      return res.status(500).json({ error: error.message });
     }
   }
 
   async approve(req, res) {
     try {
-      const { id } = req.params; 
+      const { id } = req.params;
       const approvedRequest = await RequestService.approveRequest(id);
 
       return res.status(200).json({
@@ -40,12 +35,10 @@ class RequestController {
         approvedRequest,
       });
     } catch (error) {
-    
       return res.status(400).json({ error: error.message });
     }
   }
 
-  
   async reject(req, res) {
     try {
       const { id } = req.params;
