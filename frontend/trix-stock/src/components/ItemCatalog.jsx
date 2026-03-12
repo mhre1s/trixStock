@@ -1,7 +1,7 @@
 import React, { useState, useMemo } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItemsByCategory } from "../apis/itemApi";
-import { createRequest } from "../apis/requestApi"; // Importando sua API de request
+import { createRequest } from "../apis/requestApi";
 
 const ItemCatalog = () => {
   const queryClient = useQueryClient();
@@ -130,8 +130,6 @@ const ItemCatalog = () => {
                 "{selectedItemName}"
               </span>
             </p>
-
-            {/* CAMPO DE QUANTIDADE */}
             <div className="mb-6">
               <label className="block text-sm font-semibold text-gray-700 mb-1">
                 Quantidade Desejada:

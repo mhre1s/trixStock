@@ -10,8 +10,6 @@ class ItemService {
       data.patrimony && data.patrimony.trim() !== ""
         ? data.patrimony.trim()
         : null;
-
-    // ITEM COM SERIAL
     if (patrimony !== null) {
       const existingSN = await Item.findOne({
         where: { patrimony },
@@ -127,13 +125,10 @@ class ItemService {
 
       return categories.map((cat) => {
         const itemsList = cat.Items || [];
-
-        // Calculando o total com segurança
         const totalBalance = itemsList.reduce(
           (acc, i) => acc + (Number(i.balance) || 0),
           0,
         );
-
         return {
           id: cat.id,
           name: cat.name,
