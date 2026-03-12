@@ -22,7 +22,14 @@ const OperationalScreen = () => {
   
   const sugestoes =
     name.length > 1
-      ? items?.filter((i) => i.name.toUpperCase().includes(name.toUpperCase()))
+      ? items
+          .filter((item) =>
+            item.name.toUpperCase().includes(name.toUpperCase()),
+          )
+          .filter(
+            (item, index, self) =>
+              index === self.findIndex((t) => t.name === item.name),
+          )
       : [];
 
   

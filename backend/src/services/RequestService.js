@@ -5,19 +5,38 @@ const Category = require("../model/Category");
 
 class RequestService {
   async createRequest(data) {
-    const item = await Item.findByPk(data.item_id);
-    const user = await User.findByPk(data.user_id);
+    const { itemName, quantity } = data;
+    const qtyRequested = Number(quantity) || 1;
 
-    if (!item) throw new Error("Item não encontrado.");
-    if (!user) throw new Error("Usuário não encontrado.");
+    // 1. BUSCA O PRIMEIRO ITEM DISPONÍVEL COM ESSE NOME
+    // Ordenamos pelo ID para pegar o mais antigo (FIFO)
+    const itemDisponivel = await Item.findOne({
+      where: {
+        name: itemName,
+        balance: { [Op.gte]: qtyRequested }, // Garante que tem saldo suficiente
+      },
+      order: [["id", "ASC"]],
+    });
 
-    if (item.balance < data.quantity) {
-      throw new Error("Estoque insuficiente para abrir esta solicitação.");
+    // 2. SE NÃO ACHAR, RETORNA O ERRO QUE VOCÊ VIU
+    if (!itemDisponivel) {
+      throw new Error(
+        "Item não encontrado ou estoque insuficiente para " + itemName,
+      );
     }
 
+    // 3. ABATE O SALDO NO ESTOQUE
+    // Se for item com serial, o balance vai de 1 para 0
+    // Se for cabo, abate a quantidade solicitada
+    itemDisponivel.balance -= qtyRequested;
+    await itemDisponivel.save();
+
+    // 4. CRIA A SOLICITAÇÃO VINCULANDO O ID REAL DO ITEM
     return await Request.create({
-      ...data,
-      status: "pendente",
+      item_id: itemDisponivel.id,
+      quantity: qtyRequested,
+      status: "PENDENTE",
+      // user_id: data.userId (se você já tiver autenticação)
     });
   }
 
@@ -54,7 +73,6 @@ class RequestService {
       where: { category_id: item.category_id },
     });
 
-    
     if (saldoTotalCategoria <= category.minimum) {
       console.log(`\n🚨 [ALERTA DE COMPRAS - TrixStock]`);
       console.log(`Requisição do ID ${request.id} aprovada.`);

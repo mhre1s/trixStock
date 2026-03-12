@@ -15,6 +15,7 @@ const Request = sequelize.define("Request", {
   user_id: {
     type: DataTypes.INTEGER,
     allowNull: false,
+    defaultValue: "1",
     references: {
       model: "Users",
       key: "id",
