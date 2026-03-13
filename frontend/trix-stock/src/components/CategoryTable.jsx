@@ -42,7 +42,6 @@ const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
           </thead>
           <tbody className="divide-y divide-gray-200">
             {data?.map((cat) => {
-              // --- 2. LÓGICA DE FILTRAGEM DOS ITENS ---
               const filteredItems = cat.items?.filter((item) => {
                 const search = searchTerm?.toLowerCase() || "";
                 return (
@@ -51,12 +50,10 @@ const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
                   (item.description && item.description.toLowerCase().includes(search))
                 );
               }) || [];
-
-              // Se estiver buscando e não achou nada nesta categoria, pula ela
+              const sortedItems = [...filteredItems].sort((a, b) => b.balance - a.balance)
+              if (searchTerm && sortedItems.length === 0) return null
               if (searchTerm && filteredItems.length === 0) return null;
-
-              // Se estiver buscando e achou algo, vamos considerar ela "expandida" visualmente
-              const isExpanded = expandedId === cat.id || (searchTerm && filteredItems.length > 0);
+              const isExpanded = expandedId === cat.id || (searchTerm && sortedItems.length > 0)
 
               return (
                 <React.Fragment key={cat.id}>
@@ -87,9 +84,7 @@ const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
                       </button>
                     </td>
                   </tr>
-                  
-                  {/* --- 3. MOSTRAR APENAS ITENS FILTRADOS --- */}
-                  {isExpanded && (
+                      {isExpanded && (
                     <tr>
                       <td colSpan="4" className="bg-gray-50 px-10 py-4">
                         <div className="rounded-lg border border-gray-200 bg-white overflow-hidden shadow-inner">
