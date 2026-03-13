@@ -8,7 +8,7 @@ const LoginSreen = () => {
   const navigate = useNavigate();
 
   const handleSubmit = (e) => {
-    e.preventDefault(); // Evita refresh da página
+    e.preventDefault();
     if (username === "matheus.henrique" && password === "12345678") {
       navigate("/itemregister");
     } else {

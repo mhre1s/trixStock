@@ -3,7 +3,7 @@ import React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { getItemsByCategory } from "../apis/itemApi";
 
-const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
+const CategoryTable = ({ searchTerm }) => { 
   const [expandedId, setExpandedId] = useState(null);
 
   const { data, isLoading, error } = useQuery({
@@ -42,18 +42,17 @@ const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
           </thead>
           <tbody className="divide-y divide-gray-200">
             {data?.map((cat) => {
-              const filteredItems = cat.items?.filter((item) => {
-                const search = searchTerm?.toLowerCase() || "";
-                return (
-                  item.name.toLowerCase().includes(search) ||
-                  (item.patrimony && item.patrimony.toLowerCase().includes(search)) ||
-                  (item.description && item.description.toLowerCase().includes(search))
-                );
-              }) || [];
-              const sortedItems = [...filteredItems].sort((a, b) => b.balance - a.balance)
-              if (searchTerm && sortedItems.length === 0) return null
-              if (searchTerm && filteredItems.length === 0) return null;
-              const isExpanded = expandedId === cat.id || (searchTerm && sortedItems.length > 0)
+             const filteredItems = cat.items?.filter((item) => {
+              const search = searchTerm?.toLowerCase() || "";
+              return (
+                item.name.toLowerCase().includes(search) ||
+                (item.patrimony && item.patrimony.toLowerCase().includes(search)) ||
+                (item.description && item.description.toLowerCase().includes(search))
+              );
+            }) || [];
+             const sortedItems = [...filteredItems].sort((a, b) => b.balance - a.balance);
+              if (searchTerm && sortedItems.length === 0) return null;
+              const isExpanded = expandedId === cat.id || (searchTerm && sortedItems.length > 0);
 
               return (
                 <React.Fragment key={cat.id}>
@@ -97,32 +96,32 @@ const CategoryTable = ({ searchTerm }) => { // 1. Recebe a prop aqui
                               </tr>
                             </thead>
                             <tbody className="divide-y divide-gray-100">
-                              {filteredItems.length > 0 ? (
-                                filteredItems.map((item) => (
-                                  <tr key={item.id} className="hover:bg-blue-50">
-                                    <td className="px-4 py-2">
-                                      <span className="font-bold">{item.name}</span>
-                                      <br />
-                                      <span className="text-gray-400 text-[10px]">
-                                        {item.description || "Sem descrição"}
-                                      </span>
-                                    </td>
-                                    <td className="px-4 py-2 text-gray-600 italic">
-                                      {item.patrimony || "N/A"}
-                                    </td>
-                                    <td className="px-4 py-2 text-center font-mono">
-                                      {item.balance}
-                                    </td>
-                                  </tr>
-                                ))
-                              ) : (
-                                <tr>
-                                  <td colSpan="3" className="p-4 text-center text-gray-400">
-                                    Nenhum item encontrado.
+                            {sortedItems.length > 0 ? (
+                              sortedItems.map((item) => ( 
+                                <tr key={item.id} className="hover:bg-blue-50">
+                                  <td className="px-4 py-2">
+                                    <span className="font-bold">{item.name}</span>
+                                    <br />
+                                    <span className="text-gray-400 text-[10px]">
+                                      {item.description || "Sem descrição"}
+                                    </span>
+                                  </td>
+                                  <td className="px-4 py-2 text-gray-600 italic">
+                                    {item.patrimony || "N/A"}
+                                  </td>
+                                  <td className="px-4 py-2 text-center font-mono font-bold text-blue-700">
+                                    {item.balance}
                                   </td>
                                 </tr>
-                              )}
-                            </tbody>
+                              ))
+                            ) : (
+                              <tr>
+                                <td colSpan="3" className="p-4 text-center text-gray-400">
+                                  Nenhum item encontrado.
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
                           </table>
                         </div>
                       </td>

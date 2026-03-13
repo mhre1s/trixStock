@@ -101,6 +101,10 @@ const OperationalScreen = () => {
       patrimony: patrimony.trim(),
     });
   };
+  const countSerials = () => {
+  if (!patrimony) return balance;
+  return patrimony.split(/[;]+/).map(s => s.trim()).filter(s => s !== "").length;
+};
 
   return (
     <div className="p-6 bg-gray-100 min-h-screen font-sans">
@@ -274,17 +278,19 @@ const OperationalScreen = () => {
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700">
-                  Quantidade {patrimony ? "(SN detectado: 1 un.)" : ""}
+                  Quantidade {patrimony ? `(Detectados: ${countSerials()} un.)` : ""}
                 </label>
                 <input
                   type="number"
+                  value={patrimony ? countSerials() : balance}
                   disabled={!!patrimony}
-                  value={patrimony ? 1 : balance}
                   onChange={(e) => {
                     const val = e.target.value;
                     setBalance(val === "" ? "" : Number(val));
                   }}
-                  className={`mt-1 block w-full p-2 border rounded-md ${patrimony ? "bg-gray-100" : ""}`}
+                  className={`mt-1 block w-full p-2 border rounded-md ${
+                    patrimony ? "bg-gray-100 font-bold text-blue-600" : ""
+                  }`}
                 />
               </div>
 
