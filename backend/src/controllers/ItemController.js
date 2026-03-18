@@ -15,7 +15,6 @@ class ItemController {
       return res.json(items);
     } catch (error) {
       res.status(500).json({ error: "Erro ao buscar itens" });
-      console;
     }
   }
   async deleteQty(req, res) {

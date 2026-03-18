@@ -259,9 +259,9 @@ const OperationalScreen = () => {
                   className="mt-1 block w-full p-2 border rounded-md"
                 >
                   <option value={1}>ONU</option>
-                  <option value={2}>Roteador</option>
+                  <option value={2}>Escritório</option>
                   <option value={3}>Cabo/Fibra</option>
-                  <option value={4}>Conectores</option>
+                  <option value={4}>Ferramentas</option>
                 </select>
               </div>
               <div>
