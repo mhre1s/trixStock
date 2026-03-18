@@ -39,13 +39,21 @@ const CategoryTable = ({ searchTerm }) => {
       <div className="flex justify-end gap-6 border-b border-gray-100 pb-2">
         <button
           onClick={() => setViewMode("available")}
-          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all pb-1 ${viewMode === "available" ? "text-blue-600 border-b-2 border-blue-600" : "text-gray-400 hover:text-gray-600"}`}
+          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all pb-1 ${
+            viewMode === "available"
+              ? "text-blue-600 border-b-2 border-blue-600"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
         >
           <span>📦</span> Disponível
         </button>
         <button
           onClick={() => setViewMode("unavailable")}
-          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all pb-1 ${viewMode === "unavailable" ? "text-red-500 border-b-2 border-red-500" : "text-gray-400 hover:text-gray-600"}`}
+          className={`text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all pb-1 ${
+            viewMode === "unavailable"
+              ? "text-red-500 border-b-2 border-red-500"
+              : "text-gray-400 hover:text-gray-600"
+          }`}
         >
           <span>🚫</span> Saíram / Esgotado
         </button>
@@ -56,27 +64,33 @@ const CategoryTable = ({ searchTerm }) => {
           <thead className="bg-gray-800 text-white uppercase text-[11px] tracking-wider">
             <tr>
               <th className="px-6 py-4">Item / Modelo</th>
-              <th className="px-6 py-4 text-center w-32">Qtd na Aba</th>
+              <th className="px-6 py-4 text-center w-32">Saldo Total</th>
               <th className="px-6 py-4 text-right w-40">Status</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {groupedData.map((cat) => {
-              // 1. Filtramos as unidades de cada modelo primeiro
               const modelsWithFilteredUnits = cat.models
                 .map((model) => {
                   const filteredUnits = model.units.filter((u) =>
                     viewMode === "available" ? u.balance > 0 : u.balance <= 0,
                   );
+                  const totalSaldo = filteredUnits.reduce(
+                    (acc, u) => acc + Number(u.balance),
+                    0,
+                  );
+
                   return {
                     ...model,
                     filteredUnits,
-                    count: filteredUnits.length,
+                    totalSaldo,
                   };
                 })
-                .filter((m) => m.count > 0); // Só mostra o modelo se ele tiver unidades nesse modo
-
-              // 2. Filtro de Busca
+                .filter(
+                  (m) =>
+                    m.totalSaldo > 0 ||
+                    (viewMode === "unavailable" && m.filteredUnits.length > 0),
+                );
               const finalModels = modelsWithFilteredUnits.filter(
                 (m) =>
                   m.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -105,11 +119,18 @@ const CategoryTable = ({ searchTerm }) => {
                       {cat.name.toUpperCase()}
                     </td>
                     <td className="px-6 py-3 text-center font-bold text-gray-900">
-                      {finalModels.reduce((acc, curr) => acc + curr.count, 0)}
+                      {finalModels.reduce(
+                        (acc, curr) => acc + curr.totalSaldo,
+                        0,
+                      )}
                     </td>
                     <td className="px-6 py-3 text-right">
                       <span
-                        className={`px-2 py-1 rounded-full text-[10px] font-bold ${viewMode === "unavailable" ? "bg-gray-100 text-gray-500" : "bg-green-100 text-green-600"}`}
+                        className={`px-2 py-1 rounded-full text-[10px] font-bold ${
+                          viewMode === "unavailable"
+                            ? "bg-gray-100 text-gray-500"
+                            : "bg-green-100 text-green-600"
+                        }`}
                       >
                         {viewMode === "unavailable"
                           ? "HISTÓRICO"
@@ -136,7 +157,7 @@ const CategoryTable = ({ searchTerm }) => {
                               {model.name}
                             </td>
                             <td className="px-6 py-3 text-center font-mono font-bold text-blue-700">
-                              {model.count}
+                              {model.totalSaldo}
                             </td>
                             <td className="px-6 py-3 text-right text-[10px] text-blue-500 font-bold uppercase tracking-tighter">
                               {isModelExpanded ? "Ocultar ▲" : "Ver Lista ▼"}
@@ -155,6 +176,9 @@ const CategoryTable = ({ searchTerm }) => {
                                       <th className="px-16 py-2">
                                         Patrimônio / Serial
                                       </th>
+                                      <th className="px-4 py-2 text-center">
+                                        Quantidade
+                                      </th>
                                       <th className="px-4 py-2 text-right pr-10">
                                         Observação
                                       </th>
@@ -168,6 +192,9 @@ const CategoryTable = ({ searchTerm }) => {
                                       >
                                         <td className="px-16 py-2 font-mono font-bold text-gray-600 uppercase">
                                           {unit.patrimony || "SEM SERIAL"}
+                                        </td>
+                                        <td className="px-4 py-2 text-center font-bold text-blue-600">
+                                          {unit.balance}{" "}
                                         </td>
                                         <td className="px-4 py-2 text-gray-400 italic text-right pr-10">
                                           {unit.description || "-"}

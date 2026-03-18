@@ -31,7 +31,8 @@ export const getItemsByCategory = async () => {
     const res = await api.get("/items/by-category");
     return res.data;
   } catch (error) {
-    console.error("Data fetching error " + error);
-    throw error;
-  }
+      const msg = error.response?.data?.error || "Erro ao registrar item";
+      console.error("Erro na API:", msg); 
+      throw msg; }
+
 };

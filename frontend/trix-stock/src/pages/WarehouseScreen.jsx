@@ -45,6 +45,9 @@ const OperationalScreen = () => {
       queryClient.invalidateQueries(["items"]);
       closeModal();
     },
+    onError: (error) => {
+      alert(`ERRO NO CADASTRO: Verifique se a serial/patrimônio já existe ${error}`);
+    },
   });
 
  const formatForSearch = (str) => str.replace(/\s+/g, "").toUpperCase();
