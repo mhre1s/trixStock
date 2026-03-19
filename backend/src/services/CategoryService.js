@@ -12,7 +12,7 @@ class CategoryService{
     }
     async createCategory(data){
         try {
-            const exists = await Category.findAll({
+            const exists = await Category.findOne({
                 where:{
                     name: data.name
                 }
@@ -25,7 +25,7 @@ class CategoryService{
                 minimum: data.minimum || 0
             })
         } catch (error) {
-            throw new Error('Erro ao criar categoria')
+            throw error
         }
     }
 }

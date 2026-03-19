@@ -1,19 +1,22 @@
 import React, { useState } from "react";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { registerItem, getItems } from "../apis/itemApi";
+import { createCategory, getCategories } from "../apis/categoryApi";
 import { getRequests, approveRequest, rejectRequest } from "../apis/requestApi"; 
 import CategoryTable from "../components/CategoryTable";
 
 const OperationalScreen = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-
+  const [categoryModal, setCategoryModal] = useState(false)
   const [name, setName] = useState("");
   const [tableSearch, setTableSearch] = useState("");
   const [patrimony, setPatrimony] = useState("");
   const [category, setCategory] = useState(1);
   const [balance, setBalance] = useState(0);
   const [description, setDescription] = useState("");
+  const [newCategory, setNewCategory] = useState('')
+  const [minimum, setMinimum] = useState(0)
 
   const { data: items } = useQuery({ queryKey: ["items"], queryFn: getItems });
 
@@ -22,6 +25,20 @@ const OperationalScreen = () => {
     queryFn: getRequests,
   });
 
+  const {data: categories} = useQuery({queryKey: ['categories'], queryFn: getCategories})
+
+  const createCat = useMutation({
+    mutationFn: createCategory,
+    onSuccess: () => {
+      queryClient.invalidateQueries(["categories"]);
+      closeCatModal();
+    },
+    onError: (error) => {
+      // 3. Melhorar a mensagem de erro pegando o que vem do seu Backend
+      const msg = error.response?.data?.error || error.message;
+      alert("Erro ao cadastrar categoria: " + msg);
+    },
+  });
   const approveMutation = useMutation({
     mutationFn: approveRequest,
     onSuccess: () => {
@@ -72,6 +89,13 @@ const OperationalScreen = () => {
     setName(item.name);
     setCategory(item.category_id);
   };
+
+  const closeCatModal = () =>{
+    setCategoryModal(false)
+    setNewCategory('')
+    setMinimum(0)
+  }
+
   const closeModal = () => {
     setIsModalOpen(false);
     setName("");
@@ -79,6 +103,15 @@ const OperationalScreen = () => {
     setBalance(0);
     setDescription("");
   };
+
+  const handleCatSubmit = (e) =>{
+    e.preventDefault()
+    createCat.mutate({
+      name: newCategory,
+      minimum,
+    })
+  }
+
   const handleSubmit = (e) => {
     e.preventDefault();
     const serials = patrimony
@@ -116,12 +149,20 @@ const OperationalScreen = () => {
           <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Painel Almoxarifado
           </h1>
-          <button
-            className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105"
-            onClick={() => setIsModalOpen(true)}
-          >
-            + Nova Entrada de Estoque
-          </button>
+          <div className="flex gap-5">
+            <button
+              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105"
+              onClick={() => setCategoryModal(true)}
+            >
+              + Criar categoria
+            </button>
+            <button
+              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105"
+              onClick={() => setIsModalOpen(true)}
+            >
+              + Adicionar produtos
+            </button>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -130,10 +171,10 @@ const OperationalScreen = () => {
               <h2 className="text-lg font-bold text-gray-700 mb-4 flex items-center gap-2">
                 📦 Inventário por Categoria
               </h2>
-              <input 
-                type="text" 
-                placeholder="Buscar item..." 
-                value={tableSearch} 
+              <input
+                type="text"
+                placeholder="Buscar item..."
+                value={tableSearch}
                 onChange={(e) => setTableSearch(e.target.value)}
                 className="p-2 border rounded shadow-sm mb-4 w-full md:w-80"
               />
@@ -209,6 +250,67 @@ const OperationalScreen = () => {
           </div>
         </div>
       </div>
+      {categoryModal && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-200">
+            <div className="bg-blue-600 p-4 flex justify-between items-center text-white">
+              <h2 className="text-lg font-bold">Criar nova categoria</h2>
+              <button
+                onClick={closeCatModal}
+                className="text-2xl hover:text-gray-200 hover:cursor-pointer"
+              >
+                &times;
+              </button>
+            </div>
+
+            <form
+              onSubmit={handleCatSubmit}
+              className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+            >
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Nova categoria
+                </label>
+                <input
+                  type="text"
+                  required
+                  placeholder="Digite o nome da nova categoria"
+                  value={newCategory}
+                  onChange={(e) => setNewCategory(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded-md"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700">
+                  Estoque mínimo
+                </label>
+                <input
+                  type="number"
+                  required
+                  value={minimum}
+                  onChange={(e) => setMinimum(e.target.value)}
+                  className="mt-1 block w-full p-2 border rounded-md"
+                />
+              </div>
+              <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+                <button
+                  type="button"
+                  onClick={closeCatModal}
+                  className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg hover:cursor-pointer font-bold"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  className="bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white px-4 py-2 rounded-lg font-bold"
+                >
+                  Salvar no Estoque
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
       {isModalOpen && (
         <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
           <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl overflow-hidden animate-in zoom-in duration-200">
@@ -216,7 +318,7 @@ const OperationalScreen = () => {
               <h2 className="text-lg font-bold">Nova Entrada de Estoque</h2>
               <button
                 onClick={closeModal}
-                className="text-2xl hover:text-gray-200"
+                className="text-2xl hover:text-gray-200 hover:cursor-pointer"
               >
                 &times;
               </button>
@@ -224,7 +326,7 @@ const OperationalScreen = () => {
 
             <form
               onSubmit={handleSubmit}
-              className="p-6 grid grid-cols-1 md:grid-cols-2 gap-4"
+              className="p-6 grid grid-cols-1 md:grid-cols-3 gap-4"
             >
               <div className="md:col-span-2 relative">
                 <label className="block text-sm font-semibold text-gray-700">
@@ -261,10 +363,11 @@ const OperationalScreen = () => {
                   onChange={(e) => setCategory(e.target.value)}
                   className="mt-1 block w-full p-2 border rounded-md"
                 >
-                  <option value={1}>ONU</option>
-                  <option value={2}>Escritório</option>
-                  <option value={3}>Cabo/Fibra</option>
-                  <option value={4}>Ferramentas</option>
+                  {
+                    categories?.map((cat) =>(
+                      <option key={cat.id} value={cat.id}>{cat.name}</option>
+                    ))
+                  }
                 </select>
               </div>
               <div>
@@ -278,10 +381,15 @@ const OperationalScreen = () => {
                   onChange={(e) => setPatrimony(e.target.value)}
                   className="mt-1 block w-full p-2 border rounded-md"
                 />
+                <p className="text-sm text-gray-500 italic">
+                  *Para cadastrar mais de um item com serial, digitar separados
+                  por ";" exemplo: ztegnsjhz;ztegfhh;ztegklasjkd*
+                </p>
               </div>
               <div>
                 <label className="block text-sm font-semibold text-gray-700">
-                  Quantidade {patrimony ? `(Detectados: ${countSerials()} un.)` : ""}
+                  Quantidade{" "}
+                  {patrimony ? `(Detectados: ${countSerials()} un.)` : ""}
                 </label>
                 <input
                   type="number"
@@ -297,7 +405,7 @@ const OperationalScreen = () => {
                 />
               </div>
 
-              <div className="md:col-span-2">
+              <div className="md:col-span-3">
                 <label className="block text-sm font-semibold text-gray-700">
                   Descrição/Obs
                 </label>
@@ -305,21 +413,21 @@ const OperationalScreen = () => {
                   value={description}
                   onChange={(e) => setDescription(e.target.value)}
                   className="mt-1 block w-full p-2 border rounded-md"
-                  rows="2"
+                  rows="3"
                 ></textarea>
               </div>
 
-              <div className="md:col-span-2 flex justify-end gap-3 mt-4">
+              <div className="md:col-span-3 flex justify-end gap-3 mt-4">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-lg"
+                  className="px-4 py-2 text-white bg-red-500 hover:bg-red-600 rounded-lg hover:cursor-pointer font-bold"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
-                  className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg font-bold transition-colors"
+                  className="bg-blue-600 hover:bg-blue-700 hover:cursor-pointer text-white px-4 py-2 rounded-lg font-bold"
                 >
                   Salvar no Estoque
                 </button>

@@ -141,9 +141,7 @@ const ItemCatalog = () => {
                 onChange={(e) => setQuantity(e.target.value)}
                 className="w-full p-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 outline-none"
               />
-              <p className="text-[10px] text-gray-400 mt-1 italic">
-                *Para itens com serial, solicite 1 unidade por vez.
-              </p>
+              
             </div>
 
             <div className="flex justify-end gap-3">
