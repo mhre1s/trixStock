@@ -101,6 +101,8 @@ const CategoryTable = ({ searchTerm }) => {
                   ),
               );
 
+              if (searchTerm && finalModels.length === 0) return null;
+
               if (finalModels.length === 0 && !searchTerm) return null;
               const isCatExpanded = expandedCat === cat.id || searchTerm;
 
@@ -185,22 +187,36 @@ const CategoryTable = ({ searchTerm }) => {
                                     </tr>
                                   </thead>
                                   <tbody className="divide-y divide-gray-100">
-                                    {model.filteredUnits.map((unit, idx) => (
-                                      <tr
-                                        key={idx}
-                                        className="hover:bg-white transition-colors"
-                                      >
-                                        <td className="px-16 py-2 font-mono font-bold text-gray-600 uppercase">
-                                          {unit.patrimony || "SEM SERIAL"}
-                                        </td>
-                                        <td className="px-4 py-2 text-center font-bold text-blue-600">
-                                          {unit.balance}{" "}
-                                        </td>
-                                        <td className="px-4 py-2 text-gray-400 italic text-right pr-10">
-                                          {unit.description || "-"}
-                                        </td>
-                                      </tr>
-                                    ))}
+                                    {model.filteredUnits
+                                      .filter((unit) => {
+                                        if (!searchTerm) return true;
+                                        const searchTermLower =
+                                          searchTerm.toLowerCase();
+                                        const matchesModel = model.name
+                                          .toLowerCase()
+                                          .includes(searchTermLower);
+                                        const matchesSerial = unit.patrimony
+                                          ?.toLowerCase()
+                                          .includes(searchTermLower);
+
+                                        return matchesModel || matchesSerial;
+                                      })
+                                      .map((unit, idx) => (
+                                        <tr
+                                          key={idx}
+                                          className="hover:bg-white transition-colors"
+                                        >
+                                          <td className="px-16 py-2 font-mono font-bold text-gray-600 uppercase">
+                                            {unit.patrimony || "SEM SERIAL"}
+                                          </td>
+                                          <td className="px-4 py-2 text-center font-bold text-blue-600">
+                                            {unit.balance}
+                                          </td>
+                                          <td className="px-4 py-2 text-gray-400 italic text-right pr-10">
+                                            {unit.description || "-"}
+                                          </td>
+                                        </tr>
+                                      ))}
                                   </tbody>
                                 </table>
                               </td>
