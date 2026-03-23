@@ -5,7 +5,7 @@ class RequestController {
     try {
       const request = await RequestService.createRequest({
         ...req.body,
-        user_id: 1, 
+        user_id: req.userId,
       });
       return res.status(201).json({
         message: "Solicitação enviada com sucesso!",
