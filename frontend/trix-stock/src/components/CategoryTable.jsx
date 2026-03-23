@@ -6,6 +6,7 @@ const CategoryTable = ({ searchTerm }) => {
   const [expandedCat, setExpandedCat] = useState(null);
   const [expandedModel, setExpandedModel] = useState(null);
   const [viewMode, setViewMode] = useState("available");
+  const [visibleCount, setVisibleCount] = useState(20)
 
   const { data, isLoading } = useQuery({
     queryKey: ["itemsByCategory"],
@@ -201,6 +202,7 @@ const CategoryTable = ({ searchTerm }) => {
 
                                         return matchesModel || matchesSerial;
                                       })
+                                      .slice(0, visibleCount)
                                       .map((unit, idx) => (
                                         <tr
                                           key={idx}
@@ -217,6 +219,26 @@ const CategoryTable = ({ searchTerm }) => {
                                           </td>
                                         </tr>
                                       ))}
+                                    {model.filteredUnits.length >
+                                      visibleCount && (
+                                      <tr>
+                                        <td colSpan="3" className="p-0">
+                                          <button
+                                            onClick={() =>
+                                              setVisibleCount(
+                                                (prev) => prev + 100,
+                                              )
+                                            } 
+                                            className="w-full py-2 bg-gray-50 hover:bg-blue-100 text-blue-600 font-bold text-[10px] uppercase tracking-widest border-t border-gray-200 transition-colors"
+                                          >
+                                            + Mostrar mais{" "}
+                                            {model.filteredUnits.length -
+                                              visibleCount}{" "}
+                                            equipamentos
+                                          </button>
+                                        </td>
+                                      </tr>
+                                    )}
                                   </tbody>
                                 </table>
                               </td>

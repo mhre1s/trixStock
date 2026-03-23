@@ -1,5 +1,6 @@
 const { Router } = require("express");
 
+const authController = require("../controllers/authController");
 const UserController = require("../controllers/UserController");
 const ItemController = require("../controllers/ItemController");
 const RequestController = require("../controllers/RequestController");
@@ -21,5 +22,8 @@ routes.patch("/requests/:id/reject", RequestController.reject);
 
 routes.get("/categories", CategoryController.getCategories);
 routes.post("/categories", CategoryController.createCategories)
+
+routes.post("/login", authController.login);
+routes.post("/register", authController.register);
 
 module.exports = routes;
