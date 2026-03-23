@@ -23,13 +23,18 @@ const register = async (req, res) => {
 const login = async (req, res) => {
   try {
     const { username, password } = req.body;
+
+    console.log("Tentativa de login:", { username, password });
+
     const user = await User.findOne({ where: { username } });
 
     if (!user) {
+        console.log("USUÁRIO NÃO ENCONTRADO NO BANCO");
       return res.status(401).json({ error: "Usuário ou senha inválidos" });
     }
+    console.log("Usuário achado! Hash no banco:", user.password);
     const isPasswordValid = await bcrypt.compare(password, user.password);
-
+    console.log("A senha bateu?", isPasswordValid);
     if (!isPasswordValid) {
       return res.status(401).json({ error: "Usuário ou senha inválidos" });
     }
