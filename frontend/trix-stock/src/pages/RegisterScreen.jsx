@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router"; // Se estiver usando v6 é 'react-router-dom'
 import { useMutation } from "@tanstack/react-query";
 import { registerUser } from "../apis/userApi";
 
@@ -14,22 +14,25 @@ const RegisterScreen = () => {
     mutationFn: registerUser,
     onSuccess: () => {
       alert(`Usuário ${username} criado com sucesso!`);
+      // Limpa os campos
       setName("");
       setUsername("");
       setPassword("");
       setLevel("operacional");
-      navigate("/"); // Opcional: redireciona para o login após sucesso
+      // Redireciona para o login
+      navigate("/");
     },
     onError: (error) => {
       alert(
         "Erro ao registrar usuário: " +
-          (error.response?.data?.error || "servidor offline"),
+          (error.response?.data?.error || "Servidor offline ou erro de rede"),
       );
     },
   });
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    // Envia os dados para a mutation
     const userData = { name, username, password, level };
     mutation.mutate(userData);
   };
@@ -42,6 +45,7 @@ const RegisterScreen = () => {
         </h1>
 
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+          {/* Campo Nome */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="name"
@@ -54,12 +58,13 @@ const RegisterScreen = () => {
               onChange={(e) => setName(e.target.value)}
               id="name"
               placeholder="Ex: João Silva"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               type="text"
               required
             />
           </div>
+
+          {/* Campo Usuário */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="user"
@@ -72,16 +77,16 @@ const RegisterScreen = () => {
               onChange={(e) => setUsername(e.target.value)}
               id="user"
               placeholder="nome.sobrenome"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               type="text"
               required
             />
           </div>
+
+          {/* Campo Senha */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="password"
-              d
               className="text-sm font-medium text-gray-700 ml-1"
             >
               Senha
@@ -91,12 +96,13 @@ const RegisterScreen = () => {
               onChange={(e) => setPassword(e.target.value)}
               id="password"
               placeholder="••••••••"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               type="password"
               required
             />
           </div>
+
+          {/* Campo Nível */}
           <div className="flex flex-col gap-1.5">
             <label
               htmlFor="level"
@@ -108,15 +114,15 @@ const RegisterScreen = () => {
               value={level}
               onChange={(e) => setLevel(e.target.value)}
               id="level"
-              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 cursor-pointer shadow-sm"
+              className="w-full px-4 py-2 rounded-lg border border-gray-300 bg-white outline-none transition-all focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200 cursor-pointer shadow-sm"
             >
               <option value="operacional">Operacional</option>
               <option value="almoxarifado">Almoxarifado</option>
               <option value="gestão">Gestão</option>
             </select>
           </div>
-         <button
+
+          <button
             type="submit"
             disabled={mutation.isPending}
             className={`w-full py-3 mt-4 font-semibold rounded-lg shadow-md transition-all 
@@ -154,6 +160,7 @@ const RegisterScreen = () => {
             )}
           </button>
         </form>
+
         <div className="mt-8 pt-6 border-t border-gray-100 text-center text-sm text-gray-600">
           <p>
             Já possui uma conta?{" "}

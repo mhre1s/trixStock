@@ -7,13 +7,30 @@ const LoginSreen = () => {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    if (username === "matheus.henrique" && password === "12345678") {
-      navigate("/itemregister");
+    setErrorMsg("");
+
+    try {
+    const response = await axios.post("https://trixstock.onrender.com", {
+      username,
+      password,
+    });
+
+    const { token, user } = response.data;
+
+    localStorage.setItem("@TrixStock:token", token);
+    localStorage.setItem("@TrixStock:user", JSON.stringify(user));
+
+    navigate("/itemregister");
+
+  } catch (error) {
+    if (error.response) {
+      setErrorMsg(error.response.data.error || "Erro ao logar");
     } else {
-      setErrorMsg("Usuário ou senha inválidos");
+      setErrorMsg("Servidor fora do ar");
     }
+  }
   };
 
   return (
