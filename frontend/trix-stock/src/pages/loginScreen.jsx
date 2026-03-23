@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router";
+import axios from "axios"; // IMPORTANTE: Verifique se instalou (npm install axios)
 
 const LoginSreen = () => {
   const [username, setUsername] = useState("");
@@ -12,80 +13,74 @@ const LoginSreen = () => {
     setErrorMsg("");
 
     try {
-    const response = await axios.post("https://trixstock.onrender.com", {
-      username,
-      password,
-    });
+      // AJUSTADO: Usando a rota exata que você definiu no seu routes.js
+      const response = await axios.post(
+        "https://trixstock.onrender.com/login",
+        {
+          username,
+          password,
+        },
+      );
 
-    const { token, user } = response.data;
+      const { token, user } = response.data;
 
-    localStorage.setItem("@TrixStock:token", token);
-    localStorage.setItem("@TrixStock:user", JSON.stringify(user));
+      localStorage.setItem("@TrixStock:token", token);
+      localStorage.setItem("@TrixStock:user", JSON.stringify(user));
 
-    navigate("/itemregister");
-
-  } catch (error) {
-    if (error.response) {
-      setErrorMsg(error.response.data.error || "Erro ao logar");
-    } else {
-      setErrorMsg("Servidor fora do ar");
+      navigate("/itemregister");
+    } catch (error) {
+      console.error("Erro no login:", error);
+      if (error.response) {
+        setErrorMsg(error.response.data.error || "Erro ao logar");
+      } else {
+        setErrorMsg("Servidor fora do ar ou erro de rede");
+      }
     }
-  }
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-50">
+    <div className="min-h-screen flex justify-center items-center bg-gray-50 p-4">
       <div className="w-full max-w-md p-8 bg-white border border-gray-200 rounded-2xl shadow-xl">
         <h1 className="text-3xl font-bold text-center text-gray-800 mb-8">
           Login
         </h1>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="user"
-              className="text-sm font-medium text-gray-700 ml-1"
-            >
+            <label className="text-sm font-medium text-gray-700 ml-1">
               Usuário
             </label>
             <input
               value={username}
               onChange={(e) => setUsername(e.target.value)}
-              id="user"
               placeholder="Digite seu usuário"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               type="text"
+              required
             />
           </div>
           <div className="flex flex-col gap-1.5">
-            <label
-              htmlFor="password"
-              d
-              className="text-sm font-medium text-gray-700 ml-1"
-            >
+            <label className="text-sm font-medium text-gray-700 ml-1">
               Senha
             </label>
             <input
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              id="password"
               placeholder="••••••••"
-              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 outline-none transition-all
-                         focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
+              className="w-full px-4 py-2.5 rounded-lg border border-gray-300 outline-none focus:border-emerald-500 focus:ring-2 focus:ring-emerald-200"
               type="password"
+              required
             />
           </div>
           <div className="h-5 text-center">
             {errorMsg && (
-              <p className="text-sm text-red-500 font-medium animate-bounce">
+              <p className="text-sm text-red-500 font-medium animate-pulse">
                 {errorMsg}
               </p>
             )}
           </div>
           <button
             type="submit"
-            className="w-full py-3 mt-2 bg-emerald-500 text-white font-semibold rounded-lg shadow-md
-                       hover:bg-emerald-600 active:scale-[0.98] transition-all cursor-pointer"
+            className="w-full py-3 mt-2 bg-emerald-500 text-white font-semibold rounded-lg hover:bg-emerald-600 transition-all cursor-pointer"
           >
             Entrar
           </button>
