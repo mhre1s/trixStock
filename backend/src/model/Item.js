@@ -26,7 +26,11 @@ const Item = sequelize.define(
       type: DataTypes.INTEGER,
       allowNull: false,
       defaultValue: 0,
-    }
+    },
+    rbx_id: {
+      type: DataTypes.INTEGER,
+      allowNull: true,
+    },
   },
   {
     hooks: {
