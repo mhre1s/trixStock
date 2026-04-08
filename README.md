@@ -61,7 +61,6 @@ O TrixStock elimina o retrabalho e garante a integridade dos dados através de:
 ---
 
 ### 📸 Demonstração
-> **(Arraste e solte seus prints nas áreas indicadas abaixo)**
 
 #### 📌 Tela de Cadastro com Integração
 <img width="1822" height="954" alt="Captura de tela 2026-04-08 002731" src="https://github.com/user-attachments/assets/564d6f0f-4957-47a3-a7ec-7d29b97cd8f7" />
