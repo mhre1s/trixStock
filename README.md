@@ -9,9 +9,7 @@ Este projeto foi desenvolvido para a **Trixnet** com o objetivo de centralizar o
 ---
 
 ### 🔗 Links Úteis
-* 🌐 **Aplicação Online:** [Adicione o link aqui]
-* 📄 **Documentação da API:** `Disponível sob consulta`
-
+* 🌐 **Aplicação Online:** [https://trix-stock.netlify.app/]
 ---
 
 ### 🔑 Acesso para Recrutadores (Sandbox)
@@ -34,8 +32,9 @@ Para entender o fluxo de integração e as regras de negócio, sugira-se seguir 
 2. **Cadastro de Ativo:** Vá em "Cadastrar Equipamento" e preencha os campos (Marca, Modelo, Serial e etc...).
 3. **Validação de Sincronização:** Após salvar, observe que o sistema aguarda a resposta da API do Routerbox. Se a integração for bem-sucedida, o item aparecerá na listagem com o status **"Sincronizado"** e o respectivo `rbx_id`.
 4. **Filtros:** Utilize a barra de busca para filtrar por Modelo ou Serial, simulando a busca rápida que os técnicos realizam no campo.
-5. **Edição:** Tente alterar o status de um item (ex: de "Novo" para "Em Uso") e veja a atualização refletida.
-6. **Alerta de estoque:** Caso um produto chegue na quantidade mínima aceita, na tela de alerta de estoque vai mostrar os itens que estão críticos.
+5. **Solicitação de retirada:** Tente solicitar a retirada de um produto no estoque na tela operacional.
+6. **Aprovação ou recusa de retirada:** Aprove ou recuse solicitações na tela almoxarifado logo após ter feito a requisição e veja o estoque ser atualizado
+7. **Alerta de estoque:** Caso um produto chegue na quantidade mínima aceita, na tela de alerta de estoque vai mostrar os itens que estão críticos.
 
 ---
 
@@ -65,7 +64,7 @@ O TrixStock elimina o retrabalho e garante a integridade dos dados através de:
 > **(Arraste e solte seus prints nas áreas indicadas abaixo)**
 
 #### 📌 Tela de Cadastro com Integração
-![Cadastro](link_do_print_1)
+<img width="1822" height="954" alt="Captura de tela 2026-04-08 002731" src="https://github.com/user-attachments/assets/564d6f0f-4957-47a3-a7ec-7d29b97cd8f7" />
 
 #### 📌 Listagem de Equipamentos
 ![Listagem](link_do_print_2)
