@@ -11,7 +11,7 @@ Este projeto foi desenvolvido para a Trixnet com o objetivo de centralizar o con
 
 Para testar o sistema sem expor dados sensíveis, utilize as credenciais abaixo:
 
-Usuário: testerecrutador@trixnet.com.br
+Usuário: testerecrutador
 Senha: 12345678
 
 ⚠️ Nota:
