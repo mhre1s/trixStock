@@ -1,5 +1,7 @@
 # 🚀 TrixStock
 
+> ⏳ **Nota sobre o carregamento:** Esta aplicação está hospedada no plano gratuito do Render. Devido à política de "spin-down" da plataforma, o servidor entra em modo de repouso após inatividade. **O primeiro acesso pode levar de 30 a 60 segundos para despertar o servidor.** Agradeço a paciência!
+
 Sistema de Gestão de Ativos & Integração Estratégica com ERP Routerbox
 
 Este projeto foi desenvolvido para a **Trixnet** com o objetivo de centralizar o controle de equipamentos de rede e automatizar a sincronização com o ERP oficial da empresa.
