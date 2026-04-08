@@ -70,6 +70,7 @@ O TrixStock elimina o retrabalho e garante a integridade dos dados através de:
 <img width="1897" height="948" alt="Captura de tela 2026-04-08 003016" src="https://github.com/user-attachments/assets/02be80c8-3eb7-4ef3-8bc3-0735ae047656" />
 
 #### 📌 Tela de alerta do estoque
----
+<img width="1918" height="953" alt="Captura de tela 2026-04-08 003746" src="https://github.com/user-attachments/assets/4c1a5371-715a-47a8-8b50-ef75505998df" />
+
 
 Desenvolvido por [Matheus Reis](https://matheusreisportfolio.netlify.app/) 🚀
