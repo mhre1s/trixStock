@@ -8,6 +8,10 @@ const CategoryController = require("../controllers/CategoryController")
 const authMiddleware = require('../middlewares/auth')
 const routes = new Router();
 
+app.get("/", (req, res) => {
+  res.status(200).send("Servidor está vivo!");
+});
+
 routes.post("/users", UserController.addUser);
 
 routes.get("/items/by-category", authMiddleware, ItemController.listByCategory);
