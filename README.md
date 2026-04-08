@@ -31,10 +31,11 @@ Utilize as credenciais abaixo para acessar o ambiente de demonstração:
 Para entender o fluxo de integração e as regras de negócio, sugira-se seguir estes passos:
 
 1. **Login:** Acesse com as credenciais acima.
-2. **Cadastro de Ativo:** Vá em "Cadastrar Equipamento" e preencha os campos (Marca, Modelo, Serial e MAC).
+2. **Cadastro de Ativo:** Vá em "Cadastrar Equipamento" e preencha os campos (Marca, Modelo, Serial e etc...).
 3. **Validação de Sincronização:** Após salvar, observe que o sistema aguarda a resposta da API do Routerbox. Se a integração for bem-sucedida, o item aparecerá na listagem com o status **"Sincronizado"** e o respectivo `rbx_id`.
-4. **Filtros:** Utilize a barra de busca para filtrar por MAC ou Serial, simulando a busca rápida que os técnicos realizam no campo.
+4. **Filtros:** Utilize a barra de busca para filtrar por Modelo ou Serial, simulando a busca rápida que os técnicos realizam no campo.
 5. **Edição:** Tente alterar o status de um item (ex: de "Novo" para "Em Uso") e veja a atualização refletida.
+6. **Alerta de estoque:** Caso um produto chegue na quantidade mínima aceita, na tela de alerta de estoque vai mostrar os itens que estão críticos.
 
 ---
 
@@ -43,7 +44,7 @@ Para entender o fluxo de integração e as regras de negócio, sugira-se seguir 
 O TrixStock elimina o retrabalho e garante a integridade dos dados através de:
 
 * 🔄 **Sincronização em Duas Etapas:** O item é salvo localmente e, em seguida, enviado ao ERP. O ID de retorno (`rbx_id`) é armazenado para consultas futuras.
-* 🧠 **Tratamento de Concorrência:** Lógica de backend para evitar duplicidade de: **MAC Address** e **Número de Série**.
+* 🧠 **Tratamento de Concorrência:** Lógica de backend para evitar duplicidade de: **Número de Série/Patrimônio**.
 * 📊 **Dashboard Inteligente:** Filtros por status (Novo, Usado, Defeito) e categorias de ativos.
 
 ---
