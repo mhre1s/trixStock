@@ -13,7 +13,7 @@ const SystemLayout = () => {
             <p>Tela almoxarifado</p>
           </Link>
           <Link className="text-blue-400" to="/purchasing">
-            <p>Tela compras</p>
+            <p>Tela alerta de estoque</p>
           </Link>
         </div>
       </div>

@@ -41,7 +41,7 @@ const PurchasingScreen = () => {
         <header className="flex items-center justify-between mb-10 border-b pb-6">
           <div>
             <h1 className="text-3xl font-black text-gray-900 uppercase tracking-tighter">
-              Setor de Compras <span className="text-blue-600">|</span>{" "}
+              Alerta de estoque <span className="text-blue-600">|</span>{" "}
               TrixStock
             </h1>
             <p className="text-gray-500 font-medium">

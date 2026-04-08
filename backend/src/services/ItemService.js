@@ -4,36 +4,31 @@ const axios = require("axios");
 
 class ItemService {
   constructor() {
-    // Configurações do RBX
     this.rbxUrl =
       "https://homologacaotrixnet.rbxsoft.com/routerbox/ws_json/ws_json.php";
     this.rbxApiKey = "SBC94S36EF8JTPXTDCLZF4NK7EOQAF";
   }
 
-  /**
-   * Método privado para sincronizar com o Routerbox
-   * Ele monta o "Frankenstein" fiscal que o RBX exige.
-   */
+
   async _syncWithRBX(itemLocal) {
     try {
       const rbxPayload = {
         inventory_insert: {
-          company_id: 1, // Geralmente 1 (Matriz)
-          code: `STK-${itemLocal.id}`, // Código único baseado no seu ID
+          company_id: 1, 
+          code: `STK-${itemLocal.id}`, 
           description: itemLocal.name,
-          model_id: 1, // Ajustar conforme ID de modelo existente no seu RBX
-          serial_controlled: !!itemLocal.patrimony, // true se tiver serial
-          unit_id: 1, // Ex: UN/PC
+          model_id: 1, 
+          serial_controlled: !!itemLocal.patrimony,
+          unit_id: 1, 
           sale_price: 0,
-          operation_type_workforce: "lending", // Comodato (padrão ISP)
-          efd_icms_ipi_item: "07", // Material de Uso e Consumo
-          status: "A", // Ativo
+          operation_type_workforce: "lending", 
+          efd_icms_ipi_item: "07",
+          status: "A", 
           invoice: {
             nfe_oper_venda: {
               id_nat_oper: 1,
               cfop: 5949,
               icms: { cst: "00", origem: "0" },
-              // Campos fiscais mínimos para o RBX aceitar
             },
           },
         },
@@ -44,7 +39,6 @@ class ItemService {
       });
 
       if (response.data && response.data.status === 1) {
-        // Sucesso: Guardamos o ID que o RBX gerou
         await itemLocal.update({ rbx_id: response.data.result.id });
         console.log(
           `[RBX] Item ${itemLocal.id} sincronizado. ID RBX: ${response.data.result.id}`,
@@ -55,7 +49,6 @@ class ItemService {
         );
       }
     } catch (error) {
-      // Não damos 'throw' para não travar o seu sistema se o RBX cair
       console.error("[RBX] Erro de conexão:", error.message);
     }
   }
@@ -64,7 +57,6 @@ class ItemService {
     const formattedName = data.name.trim().toUpperCase();
     let result;
 
-    // 1. Caso: Múltiplos Seriais
     if (
       data.patrimony &&
       (data.patrimony.includes(",") || data.patrimony.includes(";"))
