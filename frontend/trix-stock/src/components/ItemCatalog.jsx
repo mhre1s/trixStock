@@ -3,74 +3,18 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getItemsByCategory } from "../apis/itemApi";
 import { createRequest } from "../apis/requestApi";
 
-// --- SUB-COMPONENTE PARA A CATEGORIA ---
-const CategoryCard = ({ cat, handleOpenModal }) => {
-  const INITIAL_COUNT = 4;
-  const [visibleCount, setVisibleCount] = useState(INITIAL_COUNT);
-
-  return (
-    <div className="border border-gray-100 rounded-xl shadow-sm bg-gray-50 overflow-hidden h-fit flex flex-col">
-      <div className="bg-blue-600 p-3 flex justify-between items-center text-white">
-        <h2 className="font-semibold">{cat.name}</h2>
-        <span className="text-xs bg-blue-500 px-2 py-1 rounded">
-          {cat.displayItems.length} modelos
-        </span>
-      </div>
-
-      <ul className="p-4 space-y-2 flex-grow">
-        {cat.displayItems.slice(0, visibleCount).map((itemName, index) => (
-          <li
-            key={index}
-            className="flex items-center justify-between p-2 bg-white rounded-md border border-gray-200 hover:border-blue-300 transition-all"
-          >
-            <span className="text-gray-700 font-medium text-sm">
-              {itemName}
-            </span>
-            <button
-              onClick={() => handleOpenModal(itemName)}
-              className="bg-green-500 hover:bg-green-600 text-white text-xs px-3 py-1.5 rounded-md font-bold transition-colors shadow-sm"
-            >
-              Solicitar
-            </button>
-          </li>
-        ))}
-      </ul>
-
-      <div className="flex flex-col border-t border-gray-200 bg-white">
-        {/* Botão de Ver Mais Modelos */}
-        {visibleCount < cat.displayItems.length && (
-          <button
-            onClick={() => setVisibleCount((prev) => prev + 4)}
-            className="w-full p-2 text-xs text-blue-600 font-bold hover:bg-blue-50 transition-colors"
-          >
-            + Ver mais modelos ({cat.displayItems.length - visibleCount})
-          </button>
-        )}
-
-        {/* Botão de Ver Menos Modelos */}
-        {visibleCount > INITIAL_COUNT && (
-          <button
-            onClick={() => setVisibleCount(INITIAL_COUNT)}
-            className="w-full p-2 text-xs text-gray-400 font-bold hover:bg-red-50 hover:text-red-500 transition-colors border-t border-gray-100"
-          >
-            - Ver menos
-          </button>
-        )}
-      </div>
-    </div>
-  );
-};
+// --- SISTEMA DE PAGINAÇÃO GLOBAL E CATÁLOGO UNIFICADO ---
 
 // --- COMPONENTE PRINCIPAL ---
 const ItemCatalog = () => {
   const queryClient = useQueryClient();
-  const INITIAL_CATEGORIES = 6;
+  const ITEMS_PER_PAGE = 12;
 
   const [searchTerm, setSearchTerm] = useState("");
   const [quantity, setQuantity] = useState(1);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedItemName, setSelectedItemName] = useState("");
-  const [categoriesLimit, setCategoriesLimit] = useState(INITIAL_CATEGORIES);
+  const [currentPage, setCurrentPage] = useState(1);
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["itemsByCategory"],
@@ -105,23 +49,54 @@ const ItemCatalog = () => {
     });
   };
 
-  const filteredCatalog = useMemo(() => {
+  const flatItems = useMemo(() => {
     if (!data) return [];
-    return data
-      .map((category) => {
-        const uniqueItemNames = [...new Set(category.items.map((i) => i.name))];
-        const matchedNames = uniqueItemNames.filter((name) =>
-          name.toLowerCase().includes(searchTerm.toLowerCase()),
-        );
-        return { ...category, displayItems: matchedNames };
-      })
-      .filter((cat) => cat.displayItems.length > 0);
+    const allItems = [];
+    data.forEach((category) => {
+      const uniqueNames = [...new Set(category.items.map((i) => i.name))];
+      uniqueNames.forEach((name) => {
+        allItems.push({
+          name: name,
+          categoryName: category.name,
+          categoryId: category.id,
+        });
+      });
+    });
+
+    if (!searchTerm) return allItems;
+
+    return allItems.filter(
+      (item) =>
+        item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        item.categoryName.toLowerCase().includes(searchTerm.toLowerCase()),
+    );
   }, [data, searchTerm]);
 
-  // Reseta o limite ao pesquisar
+  // Reseta paginação ao pesquisar
   useMemo(() => {
-    setCategoriesLimit(INITIAL_CATEGORIES);
+    setCurrentPage(1);
   }, [searchTerm]);
+
+  const totalItems = flatItems.length;
+  const totalPages = Math.ceil(totalItems / ITEMS_PER_PAGE);
+  const paginatedItems = flatItems.slice(
+    (currentPage - 1) * ITEMS_PER_PAGE,
+    currentPage * ITEMS_PER_PAGE
+  );
+
+  const handleNextPage = () => {
+    if (currentPage < totalPages) {
+      setCurrentPage((p) => p + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
+
+  const handlePrevPage = () => {
+    if (currentPage > 1) {
+      setCurrentPage((p) => p - 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  };
 
   if (isLoading)
     return (
@@ -157,42 +132,81 @@ const ItemCatalog = () => {
         </div>
       </header>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredCatalog.slice(0, categoriesLimit).map((cat) => (
-          <CategoryCard
-            key={cat.id}
-            cat={cat}
-            handleOpenModal={handleOpenModal}
-          />
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+        {paginatedItems.map((item, idx) => (
+          <div key={`${item.categoryId}-${item.name}-${idx}`} className="bg-white rounded-xl shadow-sm border border-gray-100 hover:shadow-md hover:border-blue-200 transition-all flex flex-col overflow-hidden group">
+            <div className="bg-gray-50 px-4 py-3 border-b border-gray-100 flex justify-between items-center">
+              <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest truncate">{item.categoryName}</span>
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400 group-hover:text-blue-500 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
+              </svg>
+            </div>
+            <div className="p-5 flex-1 flex flex-col justify-between gap-4">
+              <h3 className="font-bold text-gray-800 text-lg leading-tight line-clamp-2">{item.name}</h3>
+              <button
+                onClick={() => handleOpenModal(item.name)}
+                className="w-full mt-auto bg-white border-2 border-blue-600 text-blue-600 hover:bg-blue-600 hover:text-white px-4 py-2 rounded-lg font-bold transition-colors shadow-sm focus:ring-4 focus:ring-blue-100 active:scale-95"
+              >
+                Solicitar
+              </button>
+            </div>
+          </div>
         ))}
-      </div>
-
-      {/* Seção de Controle das Categorias */}
-      <div className="mt-12 mb-8 flex flex-col items-center gap-4">
-        {categoriesLimit < filteredCatalog.length && (
-          <button
-            onClick={() => setCategoriesLimit((prev) => prev + 6)}
-            className="hover:cursor-pointer px-10 py-3 bg-gray-800 text-white rounded-full font-bold hover:bg-gray-700 transition-all shadow-lg flex items-center gap-3"
-          >
-            Ver mais categorias
-            <span className="bg-gray-600 px-2 py-0.5 rounded-full text-xs">
-              {filteredCatalog.length - categoriesLimit}
-            </span>
-          </button>
-        )}
-
-        {categoriesLimit > INITIAL_CATEGORIES && (
-          <button
-            onClick={() => {
-              setCategoriesLimit(INITIAL_CATEGORIES);
-              window.scrollTo({ top: 0, behavior: "smooth" });
-            }}
-            className="hover:cursor-pointer text-sm text-gray-400 font-semibold hover:text-red-500 transition-colors underline underline-offset-4"
-          >
-            Recolher categorias
-          </button>
+        {flatItems.length === 0 && (
+          <div className="col-span-full py-16 text-center text-gray-400">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-12 w-12 mx-auto mb-3 opacity-20" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+            Nenhum item encontrado no catálogo.
+          </div>
         )}
       </div>
+
+      {/* Seção de Controle de Paginação */}
+      {totalPages > 1 && (
+        <div className="mt-12 mb-8 flex flex-col items-center gap-4">
+          <div className="flex items-center gap-2 bg-white px-3 py-2 rounded-xl shadow-sm border border-gray-100">
+            <button
+              onClick={handlePrevPage}
+              disabled={currentPage === 1}
+              className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+              aria-label="Voltar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
+            </button>
+            
+            <div className="flex items-center gap-1 mx-2">
+              {[...Array(totalPages)].map((_, i) => (
+                <button
+                  key={i + 1}
+                  onClick={() => setCurrentPage(i + 1)}
+                  className={`w-9 h-9 rounded-lg text-sm font-bold transition-all ${
+                    currentPage === i + 1 
+                      ? "bg-gray-800 text-white shadow-md" 
+                      : "text-gray-600 hover:bg-gray-100"
+                  }`}
+                >
+                  {i + 1}
+                </button>
+              ))}
+            </div>
+
+            <button
+              onClick={handleNextPage}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-lg text-gray-600 hover:bg-gray-100 disabled:opacity-50 disabled:cursor-not-allowed transition-all active:scale-95"
+              aria-label="Avançar"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
+            </button>
+          </div>
+          <span className="text-sm font-medium text-gray-400">Página {currentPage} de {totalPages} • Total de {totalItems} itens</span>
+        </div>
+      )}
 
       {/* MODAL */}
       {isModalOpen && (

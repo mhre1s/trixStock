@@ -16,7 +16,7 @@ app.use(routes);
 async function startServer() {
   try {
     
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
     console.log("Models sincronizados e criados");
 
     app.listen(port, "0.0.0.0", () => {

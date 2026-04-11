@@ -5,10 +5,12 @@ import { createCategory, getCategories } from "../apis/categoryApi";
 import { getRequests, approveRequest, rejectRequest } from "../apis/requestApi"; 
 import CategoryTable from "../components/CategoryTable";
 
-const OperationalScreen = () => {
+const WarehouseScreen = () => {
   const queryClient = useQueryClient();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [categoryModal, setCategoryModal] = useState(false)
+  const [categoryModal, setCategoryModal] = useState(false);
+  const [isHistoryModalOpen, setIsHistoryModalOpen] = useState(false);
+  const [historyPage, setHistoryPage] = useState(1);
   const [name, setName] = useState("");
   const [tableSearch, setTableSearch] = useState("");
   const [patrimony, setPatrimony] = useState("");
@@ -142,6 +144,18 @@ const OperationalScreen = () => {
   return patrimony.split(/[;]+/).map(s => s.trim()).filter(s => s !== "").length;
 };
 
+  // Histórico de Paginação
+  const HISTORY_ITEMS_PER_PAGE = 10;
+  const historyRequests = requests ? [...requests] : [];
+  historyRequests.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  
+  const historyTotalItems = historyRequests.length;
+  const historyTotalPages = Math.ceil(historyTotalItems / HISTORY_ITEMS_PER_PAGE) || 1;
+  const paginatedHistory = historyRequests.slice(
+    (historyPage - 1) * HISTORY_ITEMS_PER_PAGE,
+    historyPage * HISTORY_ITEMS_PER_PAGE
+  );
+
   return (
     <div className="p-6 bg-gray-100 min-h-screen font-sans">
       <div className="max-w-6xl mx-auto">
@@ -149,15 +163,25 @@ const OperationalScreen = () => {
           <h1 className="text-3xl font-extrabold text-gray-800 tracking-tight">
             Painel Almoxarifado
           </h1>
-          <div className="flex gap-5">
+          <div className="flex flex-wrap gap-3 mt-4 sm:mt-0">
             <button
-              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105"
+              className="bg-gray-800 hover:bg-gray-700 text-white px-5 py-2.5 rounded-xl font-bold shadow-md transition-all flex items-center gap-2"
+              onClick={() => setIsHistoryModalOpen(true)}
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                <path fillRule="evenodd" d="M9 2a1 1 0 000 2h2a1 1 0 100-2H9z" clipRule="evenodd" />
+                <path fillRule="evenodd" d="M4 5a2 2 0 012-2 3 3 0 003 3h2a3 3 0 003-3 2 2 0 012 2v11a2 2 0 01-2 2H6a2 2 0 01-2-2V5zm3 4a1 1 0 000 2h.01a1 1 0 100-2H7zm3 0a1 1 0 000 2h3a1 1 0 100-2h-3zm-3 4a1 1 0 100 2h.01a1 1 0 100-2H7zm3 0a1 1 0 100 2h3a1 1 0 100-2h-3z" clipRule="evenodd" />
+              </svg>
+              Ver Relatório
+            </button>
+            <button
+              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all"
               onClick={() => setCategoryModal(true)}
             >
               + Criar categoria
             </button>
             <button
-              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all transform hover:scale-105"
+              className="hover:bg-blue-700 bg-blue-600 text-white px-5 py-2.5 rounded-xl font-bold shadow-lg transition-all"
               onClick={() => setIsModalOpen(true)}
             >
               + Adicionar produtos
@@ -436,8 +460,124 @@ const OperationalScreen = () => {
           </div>
         </div>
       )}
+      {/* MODAL DE HISTÓRICO GERAL */}
+      {isHistoryModalOpen && (
+        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-6xl max-h-[90vh] flex flex-col overflow-hidden animate-in zoom-in duration-200">
+            <div className="bg-gray-800 p-5 flex justify-between items-center text-white shrink-0">
+              <div className="flex items-center gap-3">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                </svg>
+                <h2 className="text-xl font-bold">Relatório de Requisições</h2>
+              </div>
+              <button
+                onClick={() => setIsHistoryModalOpen(false)}
+                className="text-gray-400 hover:text-white transition-colors"
+                aria-label="Fechar"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="flex-1 overflow-auto bg-gray-50/50 p-4">
+              <div className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden">
+                <div className="overflow-x-auto min-h-[400px]">
+                  <table className="w-full text-left border-collapse whitespace-nowrap">
+                    <thead>
+                      <tr className="bg-gray-50 text-gray-500 text-xs tracking-wider uppercase font-bold border-b border-gray-100">
+                        <th className="px-6 py-4">Usuário</th>
+                        <th className="px-6 py-4">Item Solicitado</th>
+                        <th className="px-6 py-4 text-center">Qtd</th>
+                        <th className="px-6 py-4">Data</th>
+                        <th className="px-6 py-4 text-center">Status</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-gray-50">
+                      {paginatedHistory.length > 0 ? (
+                        paginatedHistory.map((req) => (
+                          <tr key={req.id} className="text-sm hover:bg-blue-50/50 transition-colors">
+                            <td className="px-6 py-4 font-semibold text-gray-800">
+                              {req.user?.name || req.user?.username || "Desconhecido"}
+                            </td>
+                            <td className="px-6 py-4 font-medium text-gray-600">
+                              {req.item?.name || "Item Removido"}
+                            </td>
+                            <td className="px-6 py-4 text-center">
+                              <span className="font-bold text-gray-700 bg-gray-100 px-2.5 py-1 rounded-md">{req.quantity}</span>
+                            </td>
+                            
+                            <td className="px-6 py-4 text-gray-500">
+                              {new Date(req.createdAt).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex justify-center">
+                                <span
+                                  className={`px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wide border ${
+                                    req.status === "aprovado"
+                                      ? "bg-green-50 text-green-600 border-green-200"
+                                      : req.status === "rejeitado"
+                                        ? "bg-red-50 text-red-600 border-red-200"
+                                        : "bg-amber-50 text-amber-600 border-amber-200"
+                                  }`}
+                                >
+                                  {req.status}
+                                </span>
+                              </div>
+                            </td>
+                          </tr>
+                        ))
+                      ) : (
+                        <tr>
+                          <td colSpan="6" className="px-6 py-12 text-center text-gray-400">
+                            Nenhum registro de requisição encontrado no sistema.
+                          </td>
+                        </tr>
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            {/* Pagination Controls para Histórico */}
+            {historyTotalItems > 0 && (
+              <div className="bg-white border-t border-gray-200 px-6 py-4 flex items-center justify-between shrink-0">
+                <span className="text-sm font-medium text-gray-500">
+                  Total de <span className="font-bold text-gray-800">{historyTotalItems}</span> registros documentados
+                </span>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={() => setHistoryPage(p => Math.max(1, p - 1))}
+                    disabled={historyPage === 1}
+                    className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                  <span className="text-sm font-semibold px-2">
+                    {historyPage} / {historyTotalPages}
+                  </span>
+                  <button
+                    onClick={() => setHistoryPage(p => Math.min(historyTotalPages, p + 1))}
+                    disabled={historyPage === historyTotalPages}
+                    className="p-2 border border-gray-200 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                      <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-export default OperationalScreen;
+export default WarehouseScreen;
