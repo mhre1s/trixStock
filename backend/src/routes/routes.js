@@ -15,9 +15,9 @@ routes.get("/healthcheck", (req, res) =>
 
 routes.post("/users", UserController.addUser);
 
-routes.get("/items/by-category", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.listByCategory);
+routes.get("/items/by-category", authMiddleware, checkRole(['almoxarifado', 'gestão', 'operacional']), ItemController.listByCategory);
 routes.post("/items", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.store);
-routes.get("/items", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.list);
+routes.get("/items", authMiddleware, checkRole(['almoxarifado', 'gestão', 'operacional']), ItemController.list);
 routes.patch("/items/:id/quantity", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.deleteQty);
 
 routes.post("/requests", authMiddleware, checkRole(['operacional', 'gestão']), RequestController.store);

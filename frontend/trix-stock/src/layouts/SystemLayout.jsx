@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { Link, Outlet } from 'react-router';
+import { Link, Outlet, useNavigate } from 'react-router';
 
 const SystemLayout = () => {
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [user, setUser] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const storedUser = localStorage.getItem("@TrixStock:user");
@@ -43,18 +45,42 @@ const SystemLayout = () => {
         </div>
         
         {/* User Profile */}
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-3 relative">
           <div className="flex flex-col items-end hidden sm:flex">
             <span className="text-sm font-semibold text-gray-800 leading-tight">
               {user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : 'Usuário logado'}
             </span>
             <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{user?.level || 'Carregando...'}</span>
           </div>
-          <button className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md border-2 border-white hover:ring-4 hover:ring-blue-100 transition-all active:scale-95">
+          <button 
+            onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+            className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md border-2 border-white hover:ring-4 hover:ring-blue-100 transition-all active:scale-95"
+          >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 drop-shadow-sm" viewBox="0 0 20 20" fill="currentColor">
               <path fillRule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clipRule="evenodd" />
             </svg>
           </button>
+          
+          {/* Dropdown Menu */}
+          {isUserMenuOpen && (
+            <div className="absolute top-12 right-0 mt-2 w-48 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50">
+              <button
+                onClick={() => {
+                  localStorage.removeItem("@TrixStock:user");
+                  localStorage.removeItem("@TrixStock:token");
+                  setUser(null);
+                  navigate('/');
+                }}
+                className="w-full text-left px-4 py-2 text-sm text-red-600 font-medium hover:bg-red-50 flex items-center gap-2 transition-colors"
+                aria-label="Fazer Logoff"
+              >
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                </svg>
+                Sair
+              </button>
+            </div>
+          )}
         </div>
       </header>
 
