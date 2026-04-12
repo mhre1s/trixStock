@@ -80,8 +80,11 @@ class RequestService {
     return await request.update({ status: "rejeitado" });
   }
 
-  async getRequest() {
+  async getRequest(userId, userLevel) {
+    const whereClause = userLevel === "operacional" ? { user_id: userId } : {};
+    
     return await Request.findAll({
+      where: whereClause,
       include: [
         { model: Item, as: "item", attributes: ["name"] },
         { model: User, as: "user", attributes: ["name"] },

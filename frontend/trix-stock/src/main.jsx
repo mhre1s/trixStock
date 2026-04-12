@@ -10,6 +10,7 @@ import SystemLayout from './layouts/SystemLayout';
 import Warehouse from './pages/WarehouseScreen';
 import OperationalScreen from './pages/OperationalScreen';
 import PurchasingScreen from './pages/PurchasingScreen';
+import ProtectedRoute from './components/ProtectedRoute';
 
 
 const queryClient = new QueryClient()
@@ -23,9 +24,21 @@ createRoot(document.getElementById("root")).render(
           <Route path="/register" element={<RegisterScreen />} />
         </Route>
         <Route element={<SystemLayout/>}>
-          <Route path='/itemregister' element={<Warehouse/>}/>
-          <Route path='/operational' element={<OperationalScreen/>}/>
-          <Route path='/purchasing' element={<PurchasingScreen/>}/>
+          <Route path='/itemregister' element={
+            <ProtectedRoute allowedRoles={['almoxarifado', 'gestão']}>
+              <Warehouse/>
+            </ProtectedRoute>
+          }/>
+          <Route path='/operational' element={
+            <ProtectedRoute allowedRoles={['operacional', 'gestão']}>
+              <OperationalScreen/>
+            </ProtectedRoute>
+          }/>
+          <Route path='/purchasing' element={
+            <ProtectedRoute allowedRoles={['gestão']}>
+              <PurchasingScreen/>
+            </ProtectedRoute>
+          }/>
         </Route>
       </Routes>
     </BrowserRouter>

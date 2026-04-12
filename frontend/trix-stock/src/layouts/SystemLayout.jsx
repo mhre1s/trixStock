@@ -48,7 +48,7 @@ const SystemLayout = () => {
             <span className="text-sm font-semibold text-gray-800 leading-tight">
               {user?.username ? user.username.charAt(0).toUpperCase() + user.username.slice(1) : 'Usuário logado'}
             </span>
-            <span className="text-xs text-gray-500 font-medium tracking-wide">Administrador</span>
+            <span className="text-xs text-gray-500 font-medium tracking-wide uppercase">{user?.level || 'Carregando...'}</span>
           </div>
           <button className="h-10 w-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white shadow-md border-2 border-white hover:ring-4 hover:ring-blue-100 transition-all active:scale-95">
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 drop-shadow-sm" viewBox="0 0 20 20" fill="currentColor">
@@ -86,44 +86,50 @@ const SystemLayout = () => {
         </div>
         
         <nav className="flex-1 overflow-y-auto py-6 px-4 flex flex-col gap-2">
-          <Link 
-            to="/operational" 
-            onClick={closeSidebar}
-            className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
-          >
-            <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors text-blue-600">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <span>Tela Operacional</span>
-          </Link>
+          {['operacional', 'gestão'].includes(user?.level) && (
+            <Link 
+              to="/operational" 
+              onClick={closeSidebar}
+              className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                </svg>
+              </div>
+              <span>Tela Operacional</span>
+            </Link>
+          )}
 
-          <Link 
-            to="/itemregister" 
-            onClick={closeSidebar}
-            className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
-          >
-            <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors text-blue-600">
-               <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
-               </svg>
-            </div>
-            <span>Tela Almoxarifado</span>
-          </Link>
+          {['almoxarifado', 'gestão'].includes(user?.level) && (
+            <Link 
+              to="/itemregister" 
+              onClick={closeSidebar}
+              className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
+            >
+              <div className="p-2 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors text-blue-600">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                </svg>
+              </div>
+              <span>Tela Almoxarifado</span>
+            </Link>
+          )}
 
-          <Link 
-            to="/purchasing" 
-            onClick={closeSidebar}
-            className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
-          >
-            <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors text-red-500">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <span>Alerta de Estoque</span>
-          </Link>
+          {user?.level === 'gestão' && (
+            <Link 
+              to="/purchasing" 
+              onClick={closeSidebar}
+              className="flex items-center gap-4 px-4 py-3 text-gray-600 rounded-xl hover:bg-blue-50 hover:text-blue-700 transition-all duration-200 group font-medium"
+            >
+              <div className="p-2 bg-red-100 rounded-lg group-hover:bg-red-200 transition-colors text-red-500">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                </svg>
+              </div>
+              <span>Alerta de Estoque</span>
+            </Link>
+          )}
         </nav>
 
         <div className="px-6 py-4 border-t border-gray-100 bg-gray-50 flex items-center justify-center">

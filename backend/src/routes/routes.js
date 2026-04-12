@@ -6,6 +6,7 @@ const ItemController = require("../controllers/ItemController");
 const RequestController = require("../controllers/RequestController");
 const CategoryController = require("../controllers/CategoryController")
 const authMiddleware = require('../middlewares/auth')
+const checkRole = require('../middlewares/role')
 const routes = new Router();
 
 routes.get("/healthcheck", (req, res) =>
@@ -14,22 +15,23 @@ routes.get("/healthcheck", (req, res) =>
 
 routes.post("/users", UserController.addUser);
 
-routes.get("/items/by-category", authMiddleware, ItemController.listByCategory);
-routes.post("/items", authMiddleware, ItemController.store);
-routes.get("/items", authMiddleware, ItemController.list);
-routes.patch("/items/:id/quantity", authMiddleware, ItemController.deleteQty);
+routes.get("/items/by-category", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.listByCategory);
+routes.post("/items", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.store);
+routes.get("/items", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.list);
+routes.patch("/items/:id/quantity", authMiddleware, checkRole(['almoxarifado', 'gestão']), ItemController.deleteQty);
 
-routes.post("/requests", authMiddleware, RequestController.store);
+routes.post("/requests", authMiddleware, checkRole(['operacional', 'gestão']), RequestController.store);
 routes.get("/requests", authMiddleware, RequestController.index); 
 routes.patch(
   "/requests/:id/approve",
   authMiddleware,
+  checkRole(['almoxarifado', 'gestão']),
   RequestController.approve,
 ); 
-routes.patch("/requests/:id/reject", authMiddleware, RequestController.reject); 
+routes.patch("/requests/:id/reject", authMiddleware, checkRole(['almoxarifado', 'gestão']), RequestController.reject); 
 
 routes.get("/categories", authMiddleware, CategoryController.getCategories);
-routes.post("/categories", authMiddleware, CategoryController.createCategories);
+routes.post("/categories", authMiddleware, checkRole(['almoxarifado', 'gestão']), CategoryController.createCategories);
 
 routes.post("/login", authController.login);
 routes.post("/register", authController.register);

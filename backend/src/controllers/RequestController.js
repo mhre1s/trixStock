@@ -18,7 +18,7 @@ class RequestController {
 
   async index(req, res) {
     try {
-      const requests = await RequestService.getRequest();
+      const requests = await RequestService.getRequest(req.userId, req.userLevel);
       return res.status(200).json(requests);
     } catch (error) {
       return res.status(500).json({ error: error.message });
